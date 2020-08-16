@@ -64,8 +64,45 @@
     </LinearLayout>
     <LinearLayout
         style="@style/addAlarmContainer"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:gravity="center">
+        <CheckBox
+            style="@style/dayOfWeekChecker"
+            android:text="월">
+        </CheckBox>
+        <CheckBox
+            style="@style/dayOfWeekChecker"
+            android:text="화">
+        </CheckBox>
+        <CheckBox
+            style="@style/dayOfWeekChecker"
+            android:text="수">
+        </CheckBox>
+        <CheckBox
+            style="@style/dayOfWeekChecker"
+            android:text="목">
+        </CheckBox>
+        <CheckBox
+            style="@style/dayOfWeekChecker"
+            android:text="금">
+        </CheckBox>
+        <CheckBox
+            style="@style/dayOfWeekChecker"
+            android:textColor="#3F51B5"
+            android:text="토">
+        </CheckBox>
+        <CheckBox
+            style="@style/dayOfWeekChecker"
+            android:textColor="#F44336"
+            android:text="일">
+        </CheckBox>
+    </LinearLayout>
+    <LinearLayout
+        style="@style/addAlarmContainer"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:gravity="left">
         <Switch android:id="@+id/switch_bell"
             style="@style/addAlarmSettings"

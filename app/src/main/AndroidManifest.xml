@@ -3,6 +3,7 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="typebi.util.stralarm">
     <uses-permission android:name = "android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <dist:module dist:instant="true" />
 
     <application
@@ -18,13 +19,14 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".AddAlarm"
             android:label="Add_Alarm"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <receiver android:name=".AlarmReceiver"
+            android:exported="false"/>
     </application>
 
 </manifest>

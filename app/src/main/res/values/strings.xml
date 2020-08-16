@@ -9,7 +9,8 @@
         START_M INTEGER,
         END_H INTEGER,
         END_M INTEGER,
-        INTERVAL INTEGER
+        INTERVAL INTEGER,
+        SETTINGS INTEGER
         )</string>
     <string name="insertAlarm">insert into STRALARM(NAME , START_H , START_M , END_H , END_M , INTERVAL)  values($name, $sh, $sm, $eh, $em, $intvl)</string>
     <string name="selectLatest">select * from STRALARM order by NUM desc limit 1</string>

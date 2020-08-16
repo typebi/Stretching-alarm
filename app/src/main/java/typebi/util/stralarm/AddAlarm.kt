@@ -17,7 +17,7 @@ class AddAlarm : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_alarm)
         time_interval.minValue=1
-        time_interval.maxValue=86399
+        time_interval.maxValue=1440
         time_interval.value=intent.getIntExtra("intvl",15)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             time_start.hour = intent.getIntExtra("sh",9)
@@ -43,6 +43,9 @@ class AddAlarm : AppCompatActivity(){
                 intent.putExtra("endHour", time_end.hour)
                 intent.putExtra("endMin", time_end.minute)
                 intent.putExtra("intvl", time_interval.value)
+                intent.putExtra("bell", switch_bell.isChecked)
+                intent.putExtra("vibe", switch_vibe.isChecked)
+                intent.putExtra("dayOfWeek", switch_vibe.isChecked)
                 setResult(Activity.RESULT_OK, intent)
                 finish()
             }

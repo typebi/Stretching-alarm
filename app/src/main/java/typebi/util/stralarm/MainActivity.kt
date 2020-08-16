@@ -1,23 +1,23 @@
 package typebi.util.stralarm
 
-import android.app.Activity
+import android.app.*
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
-import android.os.Bundle
-import android.os.SystemClock
+import android.os.*
+import android.util.Log
 import android.view.*
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.children
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_main.*
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.*
 
 
@@ -30,30 +30,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         db = openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)
         db.execSQL(getString(R.string.createTable))
+        //registerReceiver(AlarmReceiver(), IntentFilter(Intent.ACTION_TIME_TICK))
         var isRunning = true
         class TimeChecker:Thread(){
             override fun run() {
                 while (isRunning){
                     SystemClock.sleep(1000)
-                    var displayMsg = ""
+                    var displayMsg : String? = null
                     if (closestAlarm<0) {
                         displayMsg ="오늘 알람은 끝"
                     }else if(closestAlarm==Int.MAX_VALUE) {
-                        displayMsg ="알람이 없어요"
+                        displayMsg ="오늘 알람이 없어요"
                     }else{
-                        /*
-                        125분
-                        125 * 60
-                        /60/60
-
-                        /60 %60
-                         */
-                        var hour = closestAlarm/60/60
-                        var min = closestAlarm/60%60
-                        var sec = closestAlarm%60%60
-                        if (hour>0) displayMsg ="다음 스트레칭까지\n"+reviseTime(hour)+" : "+reviseTime(min)+" : "+reviseTime(sec)
-                        else displayMsg ="다음 스트레칭까지\n"+reviseTime(min)+" : "+reviseTime(sec)
+                        val hour = closestAlarm/60/60
+                        val min = closestAlarm/60%60
+                        val sec = closestAlarm%60%60
+                        displayMsg = if (hour>0) "다음 스트레칭까지\n"+reviseTime(hour)+" : "+reviseTime(min)+" : "+reviseTime(sec)
+                        else "다음 스트레칭까지\n"+reviseTime(min)+" : "+reviseTime(sec)
                         closestAlarm--
+                        if(closestAlarm<0) closestAlarm = checkClosest()
                     }
                     time_display.text = displayMsg
                 }
@@ -92,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                 val intvl = data.getIntExtra("intvl", 0)
                 when (requestCode) {
                     1001 -> {
-                        db.insert("STRALARM",null, makeDataRow(name, sh, sm, eh, em, intvl))
+                        db.insert("STRALARM","SETTINGS", makeDataRow(name, sh, sm, eh, em, intvl))
                         val row = db.rawQuery(getString(R.string.selectLatest), null)
                         row.moveToNext()
                         num = row.getInt(0)
@@ -101,17 +96,19 @@ class MainActivity : AppCompatActivity() {
                         alarm_list.removeView(alarm_list.children.last())
                         alarm_list.addView( makeNewAlarm(num, name, sh.toString(), reviseTime(sm), eh.toString(), reviseTime(em), intvl.toString() ) )
                         alarm_list.addView(addNewBtn())
-                        checkClosest()
+                        closestAlarm = checkClosest()
                         existsAlarm = true
                     }
                     1002 -> {
                         db.update("STRALARM", makeDataRow(name, sh, sm, eh, em, intvl), "NUM = ?", arrayOf(num.toString()))
+                        closestAlarm = checkClosest()
                         renewAlarms()
                     }
                 }
             }else{
                 db.execSQL("delete from STRALARM where num=$num")
                 existsAlarm = false
+                closestAlarm = checkClosest()
                 renewAlarms()
             }
         }
@@ -124,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         val dp = (10*resources.displayMetrics.density+0.5f).toInt()
         params.setMargins(0,dp,0,dp)
 
-        val alarm = TextView(this)
+        val alarm = Button(this)
         alarm.setBackgroundResource(R.drawable.border_layout)
         alarm.layoutParams = params
         alarm.gravity = Gravity.CENTER_VERTICAL
@@ -190,7 +187,6 @@ class MainActivity : AppCompatActivity() {
         }
         alarms.close()
         alarm_list.addView(addNewBtn())
-        checkClosest()
     }
     private fun makeDataRow(name:String?, sh:Int, sm:Int, eh:Int, em:Int,intvl:Int) :ContentValues{
         val cv = ContentValues()
@@ -206,7 +202,7 @@ class MainActivity : AppCompatActivity() {
         return if(time<10) "0$time"
         else time.toString()
     }
-    private fun checkClosest() {
+    private fun checkClosest() : Int {
         var closestTime = Int.MAX_VALUE
         val curH = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val curM = Calendar.getInstance().get(Calendar.MINUTE)
@@ -215,18 +211,36 @@ class MainActivity : AppCompatActivity() {
         if (alarms.count != 0) {
             for (i in 1..alarms.count) {
                 alarms.moveToNext()
-                var alarmTimeM = alarms.getInt(2)*60*60 + alarms.getInt(3)*60
-                var curTimeM = curH*60*60 + curM*60 + curS
-                var endTimeM = alarms.getInt(4)*60*60 + alarms.getInt(5)*60
-                var interval = alarms.getInt(6)*60
-                while (alarmTimeM <= curTimeM && alarmTimeM<=endTimeM)
-                    alarmTimeM += interval
-                if (alarmTimeM > endTimeM) continue
-                if (alarmTimeM - curTimeM < closestTime && alarmTimeM - curTimeM >= 0)
-                    closestTime = alarmTimeM - curTimeM
+                var alarmTimeS = alarms.getInt(2)*60*60 + alarms.getInt(3)*60
+                val curTimeS = curH*60*60 + curM*60 + curS
+                val endTimeS = alarms.getInt(4)*60*60 + alarms.getInt(5)*60
+                val interval = alarms.getInt(6)*60
+                val am = getSystemService(ALARM_SERVICE) as AlarmManager
+                val alarmIntent = Intent(this, AlarmReceiver::class.java)
+                alarmIntent.putExtra("num",alarms.getInt(0))
+                val sender = PendingIntent.getBroadcast(this, alarms.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+
+                while (alarmTimeS <= curTimeS && alarmTimeS<=endTimeS)
+                    alarmTimeS += interval
+                if (alarmTimeS > endTimeS) {
+                    am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+(alarmTimeS - curTimeS)*1000, interval.toLong()*1000, sender)
+                    continue
+                }
+                if (alarmTimeS - curTimeS in 0 until closestTime)
+                    closestTime = alarmTimeS - curTimeS
+                am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+(alarmTimeS - curTimeS)*1000, interval.toLong()*1000, sender)
+                Log.v("##################", "알람등록"+alarms)
             }
+            alarms.close()
+            if(closestTime==Int.MAX_VALUE) return Int.MAX_VALUE
+            return closestTime-1
+        }else{
+            alarms.close()
+            return Int.MAX_VALUE
         }
-        closestAlarm = closestTime
-        alarms.close()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        //unregisterReceiver(AlarmReceiver())
     }
 }

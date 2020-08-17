@@ -21,9 +21,9 @@ class AlarmReceiver:BroadcastReceiver(){
         //noti 시스템 호출
         if(context!=null) {
             val noti = NotificationHandler(context)
-            noti.showNoti("타이틀", "내용", Intent(context, MainActivity::class.java))
+            noti.showNoti("스트레칭 할 시간이에요", "스트레칭 하면 15초, 안 하면 디스크수술 3천만원", Intent(context, MainActivity::class.java))
+            Log.v("##################", "알람리시버 동작")
         }
-        Log.v("##################", "알람리시버 동작")
     }
 
 }

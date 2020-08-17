@@ -15,7 +15,12 @@
     <string name="insertAlarm">insert into STRALARM(NAME , START_H , START_M , END_H , END_M , INTERVAL)  values($name, $sh, $sm, $eh, $em, $intvl)</string>
     <string name="selectLatest">select * from STRALARM order by NUM desc limit 1</string>
 
-    <string name="alarm_display_1">시작 </string>
+    <string name="alarm_display_hour">다음 스트레칭까지\n</string>
+    <string name="alarm_display_no_hour">다음 스트레칭까지\n</string>
+    <string name="alarm_display_no_alarm">알람이 없어요</string>
+
+    <string name="noti_title">스트레칭 할 시간이에요</string>
+    <string name="noti_content">스트레칭 하면 15초, 안 하면 디스크수술 3천만원</string>
 
     <string name="time_start">부터</string>
     <string name="time_end">까지</string>

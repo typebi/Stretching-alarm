@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="남은 시간">
+    </TextView>
+    <ProgressBar android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="8"
+        android:progressDrawable="@drawable/progress_bar_circle"
+        android:background="@drawable/progress_bar_circle_back"
+        android:indeterminate="false"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="60"
+        android:progress="0">
+    </ProgressBar>
+    <Button android:id="@+id/startBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="start timer"></Button>
+</FrameLayout>

@@ -25,6 +25,8 @@
         <activity android:name=".AddAlarm"
             android:label="Add_Alarm"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".ProgressPage">
+        </activity>
         <receiver android:name=".AlarmReceiver"
             android:exported="false"/>
     </application>

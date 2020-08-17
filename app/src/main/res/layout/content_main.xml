@@ -19,6 +19,11 @@
             android:layout_height="50dp"
             android:orientation="horizontal"
             android:gravity="right">
+            <Button android:id="@+id/testBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ProgressBar Test">
+            </Button>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -31,7 +36,6 @@
             android:layout_height="200dp"
             android:gravity="center_vertical"
             android:textAlignment="center"
-            android:text="스트레칭 알람"
             android:textColor="@color/textColor_1"
             android:textSize="40sp">
         </TextView>

@@ -2,9 +2,7 @@ package typebi.util.stralarm
 
 import android.app.*
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
 import android.os.*
@@ -16,47 +14,29 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_main.*
-import java.util.*
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var db:SQLiteDatabase
-    private var existsAlarm = false
-    private var closestAlarm :Int = 0
+    private lateinit var timeChecker:TimeChecker
+    private val am : AlarmManager by lazy {
+        getSystemService(ALARM_SERVICE) as AlarmManager
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         db = openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)
         db.execSQL(getString(R.string.createTable))
-        //registerReceiver(AlarmReceiver(), IntentFilter(Intent.ACTION_TIME_TICK))
-        var isRunning = true
-        class TimeChecker:Thread(){
-            override fun run() {
-                while (isRunning){
-                    SystemClock.sleep(1000)
-                    var displayMsg : String? = null
-                    if (closestAlarm<0) {
-                        displayMsg ="오늘 알람은 끝"
-                    }else if(closestAlarm==Int.MAX_VALUE) {
-                        displayMsg ="오늘 알람이 없어요"
-                    }else{
-                        val hour = closestAlarm/60/60
-                        val min = closestAlarm/60%60
-                        val sec = closestAlarm%60%60
-                        displayMsg = if (hour>0) "다음 스트레칭까지\n"+reviseTime(hour)+" : "+reviseTime(min)+" : "+reviseTime(sec)
-                        else "다음 스트레칭까지\n"+reviseTime(min)+" : "+reviseTime(sec)
-                        closestAlarm--
-                        if(closestAlarm<0) closestAlarm = checkClosest()
-                    }
-                    time_display.text = displayMsg
-                }
-            }
-        }
-        val timeChecker = TimeChecker()
+
+        timeChecker = TimeChecker(this, checkClosest())
         timeChecker.start()
         renewAlarms()
+        testBtn.setOnClickListener{
+            startActivity(Intent(this, ProgressPage::class.java))
+        }
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -96,22 +76,28 @@ class MainActivity : AppCompatActivity() {
                         alarm_list.removeView(alarm_list.children.last())
                         alarm_list.addView( makeNewAlarm(num, name, sh.toString(), reviseTime(sm), eh.toString(), reviseTime(em), intvl.toString() ) )
                         alarm_list.addView(addNewBtn())
-                        closestAlarm = checkClosest()
-                        existsAlarm = true
+                        makeDisplayThread()
                     }
                     1002 -> {
                         db.update("STRALARM", makeDataRow(name, sh, sm, eh, em, intvl), "NUM = ?", arrayOf(num.toString()))
-                        closestAlarm = checkClosest()
+                        makeDisplayThread()
                         renewAlarms()
                     }
                 }
             }else{
                 db.execSQL("delete from STRALARM where num=$num")
-                existsAlarm = false
-                closestAlarm = checkClosest()
+                val alarmIntent = Intent(this, AlarmReceiver::class.java).putExtra("num",num)
+                val pender = PendingIntent.getBroadcast(this, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+                am.cancel(pender)
+                makeDisplayThread()
                 renewAlarms()
             }
         }
+    }
+    fun makeDisplayThread(){
+        timeChecker.interrupt()
+        timeChecker = TimeChecker(this, checkClosest())
+        timeChecker.start()
     }
     private fun makeNewAlarm(num:Int, name:String?, sh:String, sm:String, eh:String, em:String,intvl:String): TextView{
         val params = LinearLayout.LayoutParams(
@@ -125,7 +111,6 @@ class MainActivity : AppCompatActivity() {
         alarm.setBackgroundResource(R.drawable.border_layout)
         alarm.layoutParams = params
         alarm.gravity = Gravity.CENTER_VERTICAL
-        //alarm.background = Color.WHITE.toDrawable()
         var content = "$sh:$sm ~ $eh:$em  / $intvl m\n월화수목금토일"
         if (name!=null && name.isNotEmpty()) content = "$name\n$content"
         alarm.text = content
@@ -134,12 +119,12 @@ class MainActivity : AppCompatActivity() {
         alarm.id = num
         val intent = Intent(this, AddAlarm::class.java)
         intent.putExtra("num", alarm.id)
-        intent.putExtra("name", name)
-        intent.putExtra("sh", sh.toInt())
-        intent.putExtra("sm", sm.toInt())
-        intent.putExtra("eh", eh.toInt())
-        intent.putExtra("em", em.toInt())
-        intent.putExtra("intvl", intvl.toInt())
+        .putExtra("name", name)
+        .putExtra("sh", sh.toInt())
+        .putExtra("sm", sm.toInt())
+        .putExtra("eh", eh.toInt())
+        .putExtra("em", em.toInt())
+        .putExtra("intvl", intvl.toInt())
         alarm.setOnClickListener{
             startActivityForResult(intent, 1002)
         }
@@ -153,11 +138,10 @@ class MainActivity : AppCompatActivity() {
         val dp = (10*resources.displayMetrics.density+0.5f).toInt()
         params.setMargins(0,dp,0,dp)
         val plusAlarmBtn = ImageButton(this)
-        plusAlarmBtn.setBackgroundResource(R.drawable.border_layout)
         plusAlarmBtn.layoutParams = params
+        plusAlarmBtn.setBackgroundResource(R.drawable.border_layout)
         plusAlarmBtn.setImageResource(android.R.drawable.ic_input_add)
-        val intentFromNewbtn = Intent(this, AddAlarm::class.java)
-        intentFromNewbtn.putExtra("isNew",true)
+        val intentFromNewbtn = Intent(this, AddAlarm::class.java).putExtra("isNew",true)
         plusAlarmBtn.setOnClickListener {
             startActivityForResult(intentFromNewbtn,1001)
         }
@@ -167,7 +151,6 @@ class MainActivity : AppCompatActivity() {
         alarm_list.removeAllViews()
         val alarms = db.rawQuery("select * from STRALARM", null)
         if(alarms.count!=0) {
-            existsAlarm = true
             for (i in 1..alarms.count) {
                 alarms.moveToNext()
                 alarm_list.addView(
@@ -182,8 +165,6 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
-        }else{
-            existsAlarm=false
         }
         alarms.close()
         alarm_list.addView(addNewBtn())
@@ -198,49 +179,41 @@ class MainActivity : AppCompatActivity() {
         cv.put("INTERVAL", intvl)
         return cv
     }
-    private fun reviseTime(time:Int) :String{
-        return if(time<10) "0$time"
-        else time.toString()
-    }
-    private fun checkClosest() : Int {
-        var closestTime = Int.MAX_VALUE
-        val curH = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val curM = Calendar.getInstance().get(Calendar.MINUTE)
-        val curS = Calendar.getInstance().get(Calendar.SECOND)
+    private fun checkClosest() : Time {
+        var closestTime = LocalDateTime.now().plusYears(1)
+        val today = LocalDateTime.now().plusSeconds(1)
         val alarms = db.rawQuery("select * from STRALARM", null)
         if (alarms.count != 0) {
             for (i in 1..alarms.count) {
                 alarms.moveToNext()
-                var alarmTimeS = alarms.getInt(2)*60*60 + alarms.getInt(3)*60
-                val curTimeS = curH*60*60 + curM*60 + curS
-                val endTimeS = alarms.getInt(4)*60*60 + alarms.getInt(5)*60
-                val interval = alarms.getInt(6)*60
-                val am = getSystemService(ALARM_SERVICE) as AlarmManager
-                val alarmIntent = Intent(this, AlarmReceiver::class.java)
-                alarmIntent.putExtra("num",alarms.getInt(0))
-                val sender = PendingIntent.getBroadcast(this, alarms.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+                val interval : Long = alarms.getLong(6)
+                var alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,alarms.getInt(2), alarms.getInt(3),0)
+                val alarmTimeEnd = LocalDateTime.of(today.year, today.month, today.dayOfMonth,alarms.getInt(4), alarms.getInt(5),0)
+                if(alarmTime.isAfter(alarmTimeEnd) && today.isAfter(alarmTimeEnd)) // 알람시작시가 종료시보다 후인경우, 종료시는 다음날 그 시각으로 설정 && 현시각이 알람종료시 이후인 경우에만(ex. 현시 새벽1시, 알람새벽2시종료)
+                    alarmTimeEnd.plusDays(1)
+                if(alarmTimeEnd.isBefore(today)) //알람종료시가 현시각보다 전이면, 알람시각은 알람시작시+1일
+                    alarmTime.plusDays(1)
+                else //알람종료시가 현시각보다 뒤면, 1. 현시각은 알람시작시 이전이거나 2. 알람기간 내에 위치
+                    if(alarmTime.isAfter(alarmTimeEnd)) // 알람종료시가 현시각 이후지만, 알람시작시가 어제인 경우 (ex. 현시 새벽1시, 알람종료시 새벽2시)
+                        alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,0, 0,0)
+                    while(alarmTime.isBefore(today)) // 알람시작시가 현시각보다 이전이면 (알람기간 내 위치)
+                        alarmTime = alarmTime.plusMinutes(interval)
 
-                while (alarmTimeS <= curTimeS && alarmTimeS<=endTimeS)
-                    alarmTimeS += interval
-                if (alarmTimeS > endTimeS) {
-                    am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+(alarmTimeS - curTimeS)*1000, interval.toLong()*1000, sender)
-                    continue
-                }
-                if (alarmTimeS - curTimeS in 0 until closestTime)
-                    closestTime = alarmTimeS - curTimeS
-                am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+(alarmTimeS - curTimeS)*1000, interval.toLong()*1000, sender)
-                Log.v("##################", "알람등록"+alarms)
+                if (alarmTime.isBefore(closestTime)) //가장 가까운 알람시간 갱신
+                    closestTime = alarmTime
             }
+            val alarmIntent = Intent(this, AlarmReceiver::class.java).putExtra("num",alarms.getInt(0))
+            val pender = PendingIntent.getBroadcast(this, alarms.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+            am.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()+ChronoUnit.MILLIS.between(today, closestTime), pender)
             alarms.close()
-            if(closestTime==Int.MAX_VALUE) return Int.MAX_VALUE
-            return closestTime-1
-        }else{
+            return Time(closestTime, Time.ALARM_EXISTS)
+        }else{ //3. 알람이 아예 없는경우
             alarms.close()
-            return Int.MAX_VALUE
+            return Time(today, Time.NO_ALARMS)
         }
     }
-    override fun onDestroy() {
-        super.onDestroy()
-        //unregisterReceiver(AlarmReceiver())
+    private fun reviseTime(time:Int) :String{
+        return if(time<10) "0$time"
+        else time.toString()
     }
 }

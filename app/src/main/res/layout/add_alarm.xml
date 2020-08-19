@@ -67,32 +67,32 @@
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
         android:gravity="center">
-        <CheckBox
+        <CheckBox android:id="@+id/day1"
             style="@style/dayOfWeekChecker"
             android:text="월">
         </CheckBox>
-        <CheckBox
+        <CheckBox android:id="@+id/day2"
             style="@style/dayOfWeekChecker"
             android:text="화">
         </CheckBox>
-        <CheckBox
+        <CheckBox android:id="@+id/day3"
             style="@style/dayOfWeekChecker"
             android:text="수">
         </CheckBox>
-        <CheckBox
+        <CheckBox android:id="@+id/day4"
             style="@style/dayOfWeekChecker"
             android:text="목">
         </CheckBox>
-        <CheckBox
+        <CheckBox android:id="@+id/day5"
             style="@style/dayOfWeekChecker"
             android:text="금">
         </CheckBox>
-        <CheckBox
+        <CheckBox android:id="@+id/day6"
             style="@style/dayOfWeekChecker"
             android:textColor="#3F51B5"
             android:text="토">
         </CheckBox>
-        <CheckBox
+        <CheckBox android:id="@+id/day7"
             style="@style/dayOfWeekChecker"
             android:textColor="#F44336"
             android:text="일">
@@ -104,7 +104,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:gravity="left">
-        <Switch android:id="@+id/switch_bell"
+        <Switch android:id="@+id/switch_ring"
             style="@style/addAlarmSettings"
             android:text="@string/bell_setting"/>
         <Switch android:id="@+id/switch_vibe"

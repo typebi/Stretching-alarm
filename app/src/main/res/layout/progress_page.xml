@@ -2,27 +2,37 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
+    android:layout_height="match_parent"
+    android:background="@color/mainBackground_1">
+    <TextView android:id="@+id/time_remaining"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="남은 시간">
+        android:textSize="50sp">
     </TextView>
     <ProgressBar android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="8"
         android:progressDrawable="@drawable/progress_bar_circle"
         android:background="@drawable/progress_bar_circle_back"
         android:indeterminate="false"
         style="?android:attr/progressBarStyleHorizontal"
-        android:max="60"
+        android:max="600"
         android:progress="0">
     </ProgressBar>
     <Button android:id="@+id/startBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:text="start timer"></Button>
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:background="@drawable/border_layout"
+        android:text="@string/progress_start"
+        android:textSize="20sp"
+        android:layout_gravity="center"/>
+    <Button android:id="@+id/exitBtn"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:background="@drawable/border_layout"
+        android:text="@string/progress_exit"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
 </FrameLayout>

@@ -37,16 +37,20 @@
             android:gravity="center_vertical"
             android:textAlignment="center"
             android:textColor="@color/textColor_1"
-            android:textSize="50sp">
+            android:textSize="50sp"
+            android:text="@string/alarm_display">
         </TextView>
-        <TextView android:id="@+id/adsense"
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/admob"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="#C4C4C4"
-            android:gravity="center"
-            android:text="광고"
-            android:textSize="30sp">
-        </TextView>
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:background="#FFFFFF"
+            ads:adSize="LARGE_BANNER"
+            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+        </com.google.android.gms.ads.AdView>
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

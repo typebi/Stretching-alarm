@@ -1,12 +1,9 @@
 package typebi.util.stralarm
 
 import android.app.*
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
@@ -18,24 +15,30 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.getSystemService
 import androidx.core.view.children
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.content_main.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var db:SQLiteDatabase
     private lateinit var timeChecker:TimeCounter
+    lateinit var mAdView : AdView
     private val am : AlarmManager by lazy {
         getSystemService(ALARM_SERVICE) as AlarmManager
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.v("@@@@@@@@@@@@@@@@@","onCreate() 실행")
         setContentView(R.layout.activity_main)
+        MobileAds.initialize(this) {}
+        mAdView = findViewById(R.id.admob)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+        Log.v("@@@@@@@@@@@@@@@@@","onCreate() 실행")
         db = openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)
         db.execSQL(getString(R.string.createTable))
         timeChecker = TimeCounter(this, checkClosest())
@@ -43,6 +46,10 @@ class MainActivity : AppCompatActivity() {
         renewAlarms()
         testBtn.setOnClickListener{
             startActivity(Intent(this, ProgressPage::class.java))
+        }
+        if (intent.getBooleanExtra("isDoze",false)) {
+            timeChecker.interrupt()
+            this.finish()
         }
     }
     override fun onStart() {
@@ -185,6 +192,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun checkClosest() : Time {
         var closestTime = LocalDateTime.now().plusYears(5)
+        lateinit var closestAlarmTitle : String
         val today = LocalDateTime.now().plusSeconds(1)
         val alarms = db.rawQuery("select * from STRALARM", null)
         if (alarms.count != 0) {
@@ -203,13 +211,16 @@ class MainActivity : AppCompatActivity() {
                     while(alarmTime.isBefore(today)) // 알람시작시가 현시각보다 이전이면 (알람기간 내 위치)
                         alarmTime = alarmTime.plusMinutes(interval)
 
-                if (alarmTime.isBefore(closestTime)) //가장 가까운 알람시간 갱신
+                if (alarmTime.isBefore(closestTime)) { //가장 가까운 알람시간 갱신
                     closestTime = alarmTime
+                    closestAlarmTitle = alarms.getString(1)
+                }
             }
             val alarmIntent = Intent(this, AlarmReceiver::class.java)
                 .putExtra("num",alarms.getInt(0))
                 .putExtra("title",getString(R.string.noti_title))
                 .putExtra("content",getString(R.string.noti_content))
+            if (closestAlarmTitle.isNotEmpty()) alarmIntent.putExtra("title",closestAlarmTitle)
             val pender = PendingIntent.getBroadcast(this, alarms.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
 
 //            val alarmInfo = JobInfo.Builder(alarms.getInt(0), ComponentName("typebi.util.stralarm", "typebi.util.stralarm.AlarmSchedulerService")).apply {
@@ -220,10 +231,12 @@ class MainActivity : AppCompatActivity() {
 //            }
 //            val js : JobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 //            js.schedule(alarmInfo.build())
-            //am.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()+ChronoUnit.MILLIS.between(today, closestTime), pender)
-            val alarmClockInfo = AlarmManager.AlarmClockInfo(ChronoUnit.MILLIS.between(today, closestTime),pender)
-            am.setAlarmClock(alarmClockInfo, pender)
-            Log.v("###############################","알람 셋팅")
+
+//            am.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()+ChronoUnit.MILLIS.between(today, closestTime), pender)
+            am.setAlarmClock(
+                AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime),pender),
+                pender)
+            Log.v("###############################","알람 셋팅 closestTime: "+ closestTime+ " , 차이1 : "+ChronoUnit.MILLIS.between(today, closestTime))
             alarms.close()
             return Time(closestTime, Time.ALARM_EXISTS)
         }else{ //3. 알람이 아예 없는경우
@@ -237,5 +250,10 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
         BackPressHandler(this).onBackPressed()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.v("##################","onDestroy()")
     }
 }

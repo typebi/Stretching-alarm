@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
+        android:textColor="#396FB4"
         android:textSize="50sp">
     </TextView>
     <ProgressBar android:id="@+id/progressBar"
@@ -22,17 +23,25 @@
     </ProgressBar>
     <Button android:id="@+id/startBtn"
         android:layout_width="120dp"
-        android:layout_height="60dp"
-        android:background="@drawable/border_layout"
+        android:layout_height="120dp"
+        android:background="@drawable/btn_circle"
         android:text="@string/progress_start"
         android:textSize="20sp"
+        android:textColor="#396FB4"
         android:layout_gravity="center"/>
-    <Button android:id="@+id/exitBtn"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
-        android:background="@drawable/border_layout"
-        android:text="@string/progress_exit"
-        android:textSize="20sp"
-        android:layout_gravity="center"
-        android:visibility="invisible"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <Button android:id="@+id/exitBtn"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/progress_exit"
+            android:textSize="20sp"
+            android:textColor="#396FB4"
+            android:layout_gravity="end"/>
+    </RelativeLayout>
 </FrameLayout>

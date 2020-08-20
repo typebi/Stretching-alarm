@@ -3,23 +3,24 @@ package typebi.util.stralarm
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.getSystemService
 import kotlinx.android.synthetic.main.progress_page.*
 
-class ProgressPage() : AppCompatActivity() {
+class ProgressPage : AppCompatActivity() {
+    private val vibe by lazy {
+        getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+    private val vibeEffect = VibrationEffect.createWaveform(longArrayOf(0,500,500,250), 1)
+    private var vibeFlag = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val noti = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         noti.cancel(intent.getIntExtra("notiId",1))
         setContentView(R.layout.progress_page)
-        val vibe = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        val vibeEffect = VibrationEffect.createWaveform(longArrayOf(0,500,500,250), 1)
         startBtn.setOnClickListener{
             startBtn.visibility = View.INVISIBLE
             val time : Int = intent.getIntExtra("time",15)
@@ -30,10 +31,7 @@ class ProgressPage() : AppCompatActivity() {
                     progressBar.setProgress(progressBar.progress + 1, true)
                     Thread.sleep(tick)
                 }
-                runOnUiThread {
-                    exitBtn.visibility = View.VISIBLE
-                    vibe.vibrate(vibeEffect)
-                }
+                if(vibeFlag) vibe.vibrate(vibeEffect)
             }).start()
             Thread(Runnable {
                 for (i in 0 .. time) {
@@ -46,5 +44,12 @@ class ProgressPage() : AppCompatActivity() {
             vibe.cancel()
             finish()
         }
+    }
+    override fun onBackPressed(){
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        vibe.cancel()
+        vibeFlag = false
     }
 }

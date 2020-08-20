@@ -16,8 +16,8 @@ class TimeCounter(private val context: Context, private var alarmTime: Time):Thr
             val hour = reviseTime(ChronoUnit.HOURS.between(LocalDateTime.now(), alarmTime.time))
             val min = reviseTime(ChronoUnit.MINUTES.between(LocalDateTime.now(), alarmTime.time) - hour.toInt()*60)
             val sec = reviseTime(ChronoUnit.SECONDS.between(LocalDateTime.now(), alarmTime.time) - hour.toInt()*60*60 - min.toInt()*60)
-            context.time_display.text = if (hour.toInt()>0) context.getString(R.string.alarm_display_hour)+"$hour : $min : $sec"
-            else context.getString(R.string.alarm_display_no_hour)+"$min : $sec"
+            context.time_display.text = if (hour.toInt()>0) context.getString(R.string.alarm_display)+"$hour : $min : $sec"
+            else context.getString(R.string.alarm_display)+"$min : $sec"
             if (alarmTime.state == Time.NO_ALARMS) {
                 context.time_display.text = context.getString(R.string.alarm_display_no_alarm)
                 break

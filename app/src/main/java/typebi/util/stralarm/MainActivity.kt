@@ -75,34 +75,27 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK && data!=null) {
             val isDelete = data.getBooleanExtra("isDelete",false)
             val num = data.getIntExtra("num", 0)
-            if (!isDelete) {
-                val name = data.getStringExtra("name")
-                val sh = data.getIntExtra("startHour", 0)
-                val sm = data.getIntExtra("startMin", 0)
-                val eh = data.getIntExtra("endHour", 0)
-                val em = data.getIntExtra("endMin", 0)
-                val intvl = data.getIntExtra("intvl", 0)
-                val settings = data.getIntExtra("settings", 0)
-                when (requestCode) {
-                    1001 -> {
-                        alarm_list.removeView(alarm_list.children.last())
-                        ViewDrawer(this).addNewAlarmToLayout(DB.insertAlarm(data, getString(R.string.selectLatest)))
-                        alarm_list.addView(ViewDrawer(this).addNewBtn())
-                        makeDisplayThread()
-                    }
-                    1002 -> {
-                        DB.updateAlarm(data)
-                        makeDisplayThread()
-                        renewAlarms()
-                    }
-                }
-            }else{
+            if (isDelete) {
                 DB.deleteAlarm(data)
                 val alarmIntent = Intent(this, AlarmReceiver::class.java).putExtra("num",num)
-                val pender = PendingIntent.getBroadcast(this, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-                am.cancel(pender)
+                val pended = PendingIntent.getBroadcast(this, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+                am.cancel(pended)
                 makeDisplayThread()
                 renewAlarms()
+                return
+            }
+            when (requestCode) {
+                1001 -> {
+                    alarm_list.removeView(alarm_list.children.last())
+                    ViewDrawer(this).addNewAlarmToLayout(DB.insertAlarm(data, getString(R.string.selectLatest)))
+                    alarm_list.addView(ViewDrawer(this).addNewBtn())
+                    makeDisplayThread()
+                }
+                1002 -> {
+                    DB.updateAlarm(data)
+                    makeDisplayThread()
+                    renewAlarms()
+                }
             }
         }
     }
@@ -113,13 +106,10 @@ class MainActivity : AppCompatActivity() {
     }
     private fun renewAlarms(){
         alarm_list.removeAllViews()
-        val alarms = db.rawQuery("select * from STRALARM", null)
-        if(alarms.count!=0)
-            for (i in 1..alarms.count) {
-                alarms.moveToNext()
-                ViewDrawer(this).addNewAlarmToLayout(DTO(alarms))
-            }
-        alarms.close()
+        DB.selectAlarms().use {
+            while (it.moveToNext())
+                ViewDrawer(this).addNewAlarmToLayout(DTO(it))
+        }
         alarm_list.addView(ViewDrawer(this).addNewBtn())
     }
     private fun makeDataRow(name:String?, sh:Int, sm:Int, eh:Int, em:Int,intvl:Int, settings:Int) :ContentValues{
@@ -137,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         var closestTime = LocalDateTime.now().plusYears(5)
         lateinit var closestAlarmTitle : String
         val today = LocalDateTime.now().plusSeconds(1)
-        val alarms = db.rawQuery("select * from STRALARM", null)
+        val alarms = DB.selectAlarms()
         if (alarms.count != 0) {
             for (i in 1..alarms.count) {
                 alarms.moveToNext()

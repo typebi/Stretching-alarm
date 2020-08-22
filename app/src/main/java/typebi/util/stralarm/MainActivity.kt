@@ -10,10 +10,7 @@ import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import com.google.android.gms.ads.AdRequest
@@ -28,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var db:SQLiteDatabase
     private lateinit var timeChecker:TimeCounter
     lateinit var mAdView : AdView
+    private val DB : DBAccesser by lazy { DBAccesser(openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)) }
     private val am : AlarmManager by lazy {
         getSystemService(ALARM_SERVICE) as AlarmManager
     }
@@ -222,17 +220,6 @@ class MainActivity : AppCompatActivity() {
                 .putExtra("content",getString(R.string.noti_content))
             if (closestAlarmTitle.isNotEmpty()) alarmIntent.putExtra("title",closestAlarmTitle)
             val pender = PendingIntent.getBroadcast(this, alarms.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-
-//            val alarmInfo = JobInfo.Builder(alarms.getInt(0), ComponentName("typebi.util.stralarm", "typebi.util.stralarm.AlarmSchedulerService")).apply {
-//                setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-//                setPersisted(true)
-//                setMinimumLatency(TimeUnit.MILLISECONDS.toMillis(ChronoUnit.MILLIS.between(today, closestTime)))
-//                setOverrideDeadline(TimeUnit.MILLISECONDS.toMillis(ChronoUnit.MILLIS.between(today, closestTime)+10))
-//            }
-//            val js : JobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-//            js.schedule(alarmInfo.build())
-
-//            am.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()+ChronoUnit.MILLIS.between(today, closestTime), pender)
             am.setAlarmClock(
                 AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime),pender),
                 pender)
@@ -243,6 +230,31 @@ class MainActivity : AppCompatActivity() {
             alarms.close()
             return Time(today, Time.NO_ALARMS)
         }
+    }
+    fun makeSwitch(data : DTO) : Switch {
+        val params = LinearLayout.LayoutParams(
+            (10*resources.displayMetrics.density+0.5f).toInt(),
+            LinearLayout.LayoutParams.MATCH_PARENT
+        ).apply {
+            weight = 1f
+            rightMargin = (5*resources.displayMetrics.density+0.5f).toInt()
+        }
+        val switch = Switch(this).apply {
+            layoutParams = params
+            if(data.settings == data.settings or (1 shl 9)) isChecked = true
+            id = data.num
+        }
+        switch.setOnCheckedChangeListener { _, isNotChecked ->
+            val pended = PendingIntent.getBroadcast(applicationContext, data.num, Intent(this, AlarmReceiver::class.java).setAction("STRETCHING_TIME"), PendingIntent.FLAG_UPDATE_CURRENT)
+            am.cancel(pended)
+            pended.cancel()
+            data.settings = if (isNotChecked) data.settings or (1 shl 9) //off -> on
+            else data.settings xor (1 shl 9) //on -> off
+            DB.updateAlarm(data)
+            makeDisplayThread()
+            renewAlarms()
+        }
+        return switch
     }
     private fun reviseTime(time:Int) :String{
         return if(time<10) "0$time"

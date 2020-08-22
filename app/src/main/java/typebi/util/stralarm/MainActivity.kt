@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                         makeDisplayThread()
                     }
                     1002 -> {
-                        db.update("STRALARM", makeDataRow(name, sh, sm, eh, em, intvl, settings), "NUM = ?", arrayOf(num.toString()))
+                        DB.updateAlarm(data)
                         makeDisplayThread()
                         renewAlarms()
                     }

@@ -106,7 +106,8 @@
         android:gravity="left">
         <Switch android:id="@+id/switch_ring"
             style="@style/addAlarmSettings"
-            android:text="@string/bell_setting"/>
+            android:text="@string/bell_setting"
+            android:visibility="invisible"/>
         <Switch android:id="@+id/switch_vibe"
             style="@style/addAlarmSettings"
             android:text="@string/vibration_setting"/>

@@ -26,26 +26,31 @@ class AddAlarm : AppCompatActivity(){
             time_end.hour = intent.getIntExtra("eh",18)
             time_end.minute = intent.getIntExtra("em",0)
         }
-        val settings = arrayOf(day1, day2, day3, day4, day5, day6, day7, switch_ring, switch_vibe)
-        for (i in 0 .. 4)
-            settings[i].isChecked = true
-        if(intent.getBooleanExtra("isNew", false))
-            btn_delete.visibility = View.INVISIBLE;
-        switch_vibe.isChecked =  true
+        val settings = intent.getIntExtra("settings",0)
+        val settingViews = arrayOf(day1, day2, day3, day4, day5, day6, day7, switch_ring, switch_vibe)
+        if(intent.getBooleanExtra("isNew", false)) {
+            btn_delete.visibility = View.INVISIBLE
+            switch_vibe.isChecked =  true
+            for (i in 0 .. 4)
+                settingViews[i].isChecked = true
+        }else
+            for (i in 0 .. 8)
+                if (settings == settings or (1 shl i))
+                    settingViews[i].isChecked = true
         val num = intent.getIntExtra("num",0)
-        var name = intent.getStringExtra("name")
-        if (name!=null)
-            alarm_name.setText(name, TextView.BufferType.EDITABLE)
+        if (intent.getStringExtra("name") !=null)
+            alarm_name.setText(intent.getStringExtra("name"), TextView.BufferType.EDITABLE)
         btn_add.setOnClickListener {
-            name = alarm_name.text.toString()
+            val name = alarm_name.text.toString()
             var setting = 0b0
-            for (compo in settings){
+            for (compo in settingViews){
                 if (compo.isChecked){
-                    val idx = settings.indexOf(compo)
+                    val idx = settingViews.indexOf(compo)
                     setting = setting or (1 shl idx)
                 }
             }
-            Log.v("#########################",setting.toString(2))
+            setting = setting or (1 shl 9)
+            Log.v("#####################",setting.toString(2))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 intent.putExtra("isDelete",false)
                 intent.putExtra("num", num)

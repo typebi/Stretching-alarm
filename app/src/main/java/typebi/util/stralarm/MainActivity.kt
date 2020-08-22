@@ -1,35 +1,35 @@
 package typebi.util.stralarm
 
 import android.app.*
-import android.content.ContentValues
 import android.content.Intent
-import android.content.IntentFilter
 import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_main.*
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var db:SQLiteDatabase
     private lateinit var timeChecker:TimeCounter
-    lateinit var mAdView : AdView
-    private val am : AlarmManager by lazy {
-        getSystemService(ALARM_SERVICE) as AlarmManager
+    private lateinit var mAdView : AdView
+    private val am : AlarmManager by lazy { getSystemService(ALARM_SERVICE) as AlarmManager }
+    private val DB : DBAccesser by lazy { DBAccesser(openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)) }
+    private var i : Int = 0
+    private val snackbar by lazy {
+        Snackbar.make(this.main_layout, "", Snackbar.LENGTH_LONG)
+        .setActionTextColor(Color.WHITE)
+        .setAction("EXIT"){ this.finish() }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,30 +39,29 @@ class MainActivity : AppCompatActivity() {
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
         Log.v("@@@@@@@@@@@@@@@@@","onCreate() 실행")
-        db = openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)
-        db.execSQL(getString(R.string.createTable))
-        timeChecker = TimeCounter(this, checkClosest())
+        DB.createTable(getString(R.string.createTable))
+        timeChecker = TimeCounter(this, checkClosest(DB.selectAlarms()), i++).apply { isDaemon = true }
         timeChecker.start()
         renewAlarms()
         testBtn.setOnClickListener{
             startActivity(Intent(this, ProgressPage::class.java))
+        }
+        setting_menu.setOnClickListener {
+            registerForContextMenu(setting_menu)
+            openContextMenu(setting_menu)
+            unregisterForContextMenu(setting_menu)
         }
         if (intent.getBooleanExtra("isDoze",false)) {
             timeChecker.interrupt()
             this.finish()
         }
     }
-    override fun onStart() {
-        super.onStart()
-        Log.v("%%%%%%%%%%%%%%%%%%%","onStart() 실행")
-    }
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
-        return true
     }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onContextItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -71,41 +70,30 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && data!=null) {
-            val isDelete = data.getBooleanExtra("isDelete",false)
-            val num = data.getIntExtra("num", 0)
-            if (!isDelete) {
-                val name = data.getStringExtra("name")
-                val sh = data.getIntExtra("startHour", 0)
-                val sm = data.getIntExtra("startMin", 0)
-                val eh = data.getIntExtra("endHour", 0)
-                val em = data.getIntExtra("endMin", 0)
-                val intvl = data.getIntExtra("intvl", 0)
-                val settings = data.getIntExtra("settings", 0)
-                when (requestCode) {
-                    1001 -> {
-                        db.insert("STRALARM",null, makeDataRow(name, sh, sm, eh, em, intvl, settings))
-                        val justInsertedData = db.rawQuery(getString(R.string.selectLatest), null)
-                        justInsertedData.moveToNext()
-                        alarm_list.removeView(alarm_list.children.last())
-                        alarm_list.addView(makeNewAlarm(justInsertedData))
-                        alarm_list.addView(addNewBtn())
-                        makeDisplayThread()
-                        justInsertedData.close()
-                    }
-                    1002 -> {
-                        db.update("STRALARM", makeDataRow(name, sh, sm, eh, em, intvl, settings), "NUM = ?", arrayOf(num.toString()))
-                        makeDisplayThread()
-                        renewAlarms()
-                    }
-                }
-            }else{
-                db.execSQL("delete from STRALARM where num=$num")
-                val alarmIntent = Intent(this, AlarmReceiver::class.java).putExtra("num",num)
-                val pender = PendingIntent.getBroadcast(this, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-                am.cancel(pender)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intentData)
+        if (resultCode != Activity.RESULT_OK || intentData==null) {
+            Log.v("Error in onActivityResult : ", "resultCode != Activity.RESULT_OK  or  intentData==null")
+            return
+        }
+        if (intentData.getBooleanExtra("isDelete",false)){
+            DB.deleteAlarm(intentData)
+            val pended = PendingIntent.getBroadcast(applicationContext,intentData.getIntExtra("num", 0),Intent(this, AlarmReceiver::class.java).setAction("STRETCHING_TIME"),PendingIntent.FLAG_CANCEL_CURRENT)
+            am.cancel(pended)
+            pended.cancel()
+            makeDisplayThread()
+            renewAlarms()
+            return
+        }
+        when (requestCode) {
+            1001 -> {
+                alarm_list.removeView(alarm_list.children.last())
+                ViewDrawer(this).addNewAlarmToLayout(DB.insertAlarm(intentData, getString(R.string.selectLatest)))
+                alarm_list.addView(ViewDrawer(this).addNewBtn())
+                makeDisplayThread()
+            }
+            1002 -> {
+                DB.updateAlarm(intentData)
                 makeDisplayThread()
                 renewAlarms()
             }
@@ -113,147 +101,130 @@ class MainActivity : AppCompatActivity() {
     }
     fun makeDisplayThread(){
         timeChecker.interrupt()
-        timeChecker = TimeCounter(this, checkClosest())
+        Log.v("$$$$$$$$$$$$$$$$$$$$$$$$$$$", "스레드 중지 중")
+        timeChecker = TimeCounter(this, checkClosest(DB.selectAlarms()), i++)
         timeChecker.start()
     }
-    private fun makeNewAlarm(data : Cursor): TextView{
-        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (110*resources.displayMetrics.density+0.5f).toInt())
-        val dp = (10*resources.displayMetrics.density+0.5f).toInt()
-        params.setMargins(0,dp,0,dp)
-        val fixedSh = if (data.getInt(2)>=12) "PM "+(data.getInt(2)-12)
-        else "AM "+data.getInt(2)
-        val fixedEh = if (data.getInt(4)>=12) "PM "+(data.getInt(4)-12)
-        else "AM "+data.getInt(4)
-        var content = "$fixedSh:"+reviseTime(data.getInt(3))+" ~ $fixedEh:"+reviseTime(data.getInt(5))+"  / "+data.getInt(6)+" m\n월화수목금토일"
-        val alarm = Button(this).apply {
-            setBackgroundResource(R.drawable.border_layout)
-            layoutParams = params
-            gravity = Gravity.CENTER_VERTICAL
-        }
-
-        if (data.getString(1).isNotEmpty()) content = data.getString(1)+"\n$content"
-        alarm.text = content
-        alarm.textSize = 25.toFloat()
-        alarm.setTextColor(Color.parseColor("#000000"))
-        alarm.id = data.getInt(0)
-        val intent = Intent(this, AddAlarm::class.java).apply {
-            putExtra("num", alarm.id)
-            putExtra("name", data.getString(1))
-            putExtra("sh", data.getInt(2))
-            putExtra("sm", data.getInt(3))
-            putExtra("eh", data.getInt(4))
-            putExtra("em", data.getInt(5))
-            putExtra("intvl", data.getInt(6))
-            putExtra("settings", data.getInt(7))
-        }
-        alarm.setOnClickListener{
-            startActivityForResult(intent, 1002)
-        }
-        return alarm
-    }
-    private fun addNewBtn() :ImageButton{
+    fun makeSwitch(data : DTO) : Switch{
         val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            (110*resources.displayMetrics.density+0.5f).toInt()
-        )
-        val dp = (10*resources.displayMetrics.density+0.5f).toInt()
-        params.setMargins(0,dp,0,dp)
-        val plusAlarmBtn = ImageButton(this)
-        plusAlarmBtn.layoutParams = params
-        plusAlarmBtn.setBackgroundResource(R.drawable.border_layout)
-        plusAlarmBtn.setImageResource(R.drawable.pointer_cell_large)
-        val intentFromNewbtn = Intent(this, AddAlarm::class.java).putExtra("isNew",true)
-        plusAlarmBtn.setOnClickListener {
-            startActivityForResult(intentFromNewbtn,1001)
+            (10*resources.displayMetrics.density+0.5f).toInt(),
+            LinearLayout.LayoutParams.MATCH_PARENT
+        ).apply {
+            weight = 1f
+            rightMargin = (5*resources.displayMetrics.density+0.5f).toInt()
         }
-        return plusAlarmBtn
+        val switch = Switch(this).apply {
+            layoutParams = params
+            if(data.settings == data.settings or (1 shl 9)) isChecked = true
+            id = data.num
+        }
+        switch.setOnCheckedChangeListener { _, isNotChecked ->
+            val pended = PendingIntent.getBroadcast(applicationContext, data.num, Intent(this, AlarmReceiver::class.java).setAction("STRETCHING_TIME"), PendingIntent.FLAG_UPDATE_CURRENT)
+            am.cancel(pended)
+            pended.cancel()
+            data.settings = if (isNotChecked) data.settings or (1 shl 9) //off -> on
+                else data.settings xor (1 shl 9) //on -> off
+            DB.updateAlarm(data)
+            makeDisplayThread()
+            renewAlarms()
+        }
+        return switch
     }
     private fun renewAlarms(){
         alarm_list.removeAllViews()
-        val alarms = db.rawQuery("select * from STRALARM", null)
-        if(alarms.count!=0)
-            for (i in 1..alarms.count) {
-                alarms.moveToNext()
-                alarm_list.addView(makeNewAlarm(alarms))
-            }
-        alarms.close()
-        alarm_list.addView(addNewBtn())
+        DB.selectAlarms().use {alarms ->
+            while (alarms.moveToNext())
+                ViewDrawer(this).addNewAlarmToLayout(DTO(alarms))
+        }
+        alarm_list.addView(ViewDrawer(this).addNewBtn())
     }
-    private fun makeDataRow(name:String?, sh:Int, sm:Int, eh:Int, em:Int,intvl:Int, settings:Int) :ContentValues{
-        val cv = ContentValues()
-        cv.put("NAME", name)
-        cv.put("START_H", sh)
-        cv.put("START_M", sm)
-        cv.put("END_H", eh)
-        cv.put("END_M", em)
-        cv.put("INTERVAL", intvl)
-        cv.put("SETTINGS",settings)
-        return cv
-    }
-    private fun checkClosest() : Time {
-        var closestTime = LocalDateTime.now().plusYears(5)
-        lateinit var closestAlarmTitle : String
-        val today = LocalDateTime.now().plusSeconds(1)
-        val alarms = db.rawQuery("select * from STRALARM", null)
-        if (alarms.count != 0) {
-            for (i in 1..alarms.count) {
-                alarms.moveToNext()
-                val interval : Long = alarms.getLong(6)
-                var alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,alarms.getInt(2), alarms.getInt(3),0)
-                val alarmTimeEnd = LocalDateTime.of(today.year, today.month, today.dayOfMonth,alarms.getInt(4), alarms.getInt(5),0)
-                if(alarmTime.isAfter(alarmTimeEnd) && today.isAfter(alarmTimeEnd)) // 알람시작시가 종료시보다 후인경우, 종료시는 다음날 그 시각으로 설정 && 현시각이 알람종료시 이후인 경우에만(ex. 현시 새벽1시, 알람새벽2시종료)
-                    alarmTimeEnd.plusDays(1)
-                if(alarmTimeEnd.isBefore(today)) //알람종료시가 현시각보다 전이면, 알람시각은 알람시작시+1일
-                    alarmTime.plusDays(1)
-                else //알람종료시가 현시각보다 뒤면, 1. 현시각은 알람시작시 이전이거나 2. 알람기간 내에 위치
-                    if(alarmTime.isAfter(alarmTimeEnd)) // 알람종료시가 현시각 이후지만, 알람시작시가 어제인 경우 (ex. 현시 새벽1시, 알람종료시 새벽2시)
-                        alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,0, 0,0)
-                    while(alarmTime.isBefore(today)) // 알람시작시가 현시각보다 이전이면 (알람기간 내 위치)
-                        alarmTime = alarmTime.plusMinutes(interval)
-
-                if (alarmTime.isBefore(closestTime)) { //가장 가까운 알람시간 갱신
-                    closestTime = alarmTime
-                    closestAlarmTitle = alarms.getString(1)
+    private fun checkClosest(alarmList : Cursor) : Time {
+        var closestTime = Time(LocalDateTime.now().plusYears(5), DTO(-1,"",-1,-1,-1,-1,-1,-1), Time.NO_ALARMS)
+        val now = LocalDateTime.now().plusSeconds(1)
+        alarmList.use {
+            while (alarmList.moveToNext()) {
+                val interval = alarmList.getLong(6)
+                val setting = alarmList.getInt(7)
+                if (setting != setting or (1 shl 9)) continue
+                if (setting == (setting shr 7) shl 7) continue
+                var startTime = moveNextDay(LocalDateTime.of(now.year,now.month,now.dayOfMonth,alarmList.getInt(2),alarmList.getInt(3),0),setting)
+                var endTime = moveNextDay(LocalDateTime.of(now.year,now.month,now.dayOfMonth,alarmList.getInt(4),alarmList.getInt(5),0), setting)
+                if(startTime.isEqual(endTime)) endTime = endTime.plusDays(1)
+                if (now.plusDays(1).isBefore(startTime)){
+                    closestTime = Time(startTime,DTO(alarmList),Time.ALARM_EXISTS)
+                    continue
+                }
+                Log.v("@@@ checkClosest @@@","checkClosest 1")
+                if (startTime.isAfter(endTime))//자정에 걸쳐있는지 여부로 분기
+                    if (now.isBefore(endTime))
+                        startTime = startTime.minusDays(1)
+                    else
+                        endTime = endTime.plusDays(1)
+                Log.v("@@@ checkClosest @@@","checkClosest 2")
+                //시작시 이전 |--v--(-----)-----|
+                if (now.isBefore(startTime))
+                    if(startTime.isBefore(closestTime.time)) {
+                        Log.v("#########1111###########","시작시 이전 "+startTime.toString())
+                        closestTime = Time(startTime,DTO(alarmList),Time.ALARM_EXISTS)
+                        continue
+                    }
+                Log.v("@@@ checkClosest @@@","checkClosest 3")
+                //시작시 이후 |-----(--v--)-----|
+                if (now.isAfter(startTime) && now.isBefore(endTime)) {
+                    Log.v("@@@ moveNextDay @@@","시작시 이후")
+                    while (startTime.isBefore(now))
+                        startTime = startTime.plusMinutes(interval)
+                    Log.v("#########2222###########", "시작이후 종료이전 "+startTime.toString())
+                    if (startTime.isAfter(endTime)) startTime = moveNextDay(startTime, setting)
+                    Log.v("#########2222###########", "시작이후 종료이전 "+startTime.toString())
+                    if (startTime.isBefore(closestTime.time)) {
+                        closestTime = Time(startTime, DTO(alarmList), Time.ALARM_EXISTS)
+                        continue
+                    }
+                }
+                //종료시 이후 |-----(-----)--v--|
+                startTime = moveNextDay(startTime, setting)
+                Log.v("#########3333###########","종료시 이후 "+startTime.toString())
+                if(startTime.isBefore(closestTime.time)) {
+                    closestTime = Time(startTime,DTO(alarmList),Time.ALARM_EXISTS)
+                    continue
                 }
             }
-            val alarmIntent = Intent(this, AlarmReceiver::class.java)
-                .putExtra("num",alarms.getInt(0))
-                .putExtra("title",getString(R.string.noti_title))
-                .putExtra("content",getString(R.string.noti_content))
-            if (closestAlarmTitle.isNotEmpty()) alarmIntent.putExtra("title",closestAlarmTitle)
-            val pender = PendingIntent.getBroadcast(this, alarms.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-
-//            val alarmInfo = JobInfo.Builder(alarms.getInt(0), ComponentName("typebi.util.stralarm", "typebi.util.stralarm.AlarmSchedulerService")).apply {
-//                setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-//                setPersisted(true)
-//                setMinimumLatency(TimeUnit.MILLISECONDS.toMillis(ChronoUnit.MILLIS.between(today, closestTime)))
-//                setOverrideDeadline(TimeUnit.MILLISECONDS.toMillis(ChronoUnit.MILLIS.between(today, closestTime)+10))
-//            }
-//            val js : JobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-//            js.schedule(alarmInfo.build())
-
-//            am.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()+ChronoUnit.MILLIS.between(today, closestTime), pender)
-            am.setAlarmClock(
-                AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime),pender),
-                pender)
-            Log.v("###############################","알람 셋팅 closestTime: "+ closestTime+ " , 차이1 : "+ChronoUnit.MILLIS.between(today, closestTime))
-            alarms.close()
-            return Time(closestTime, Time.ALARM_EXISTS)
-        }else{ //3. 알람이 아예 없는경우
-            alarms.close()
-            return Time(today, Time.NO_ALARMS)
         }
+        if (closestTime.state==Time.ALARM_EXISTS) setAlarm(closestTime)
+        return closestTime
     }
-    private fun reviseTime(time:Int) :String{
-        return if(time<10) "0$time"
-        else time.toString()
+    private fun setAlarm(closest : Time){
+        val title = if (closest.data.name.isNotEmpty()) closest.data.name else getString(R.string.noti_title)
+        val vibration = closest.data.settings == closest.data.settings or (1 shl 8)
+        val alarmIntent = Intent(this, AlarmReceiver::class.java)
+            .putExtra("num", closest.data.num)
+            .putExtra("title",title)
+            .putExtra("content", getString(R.string.noti_content))
+            .setAction("STRETCHING_TIME")
+            .putExtra("vibration", vibration)
+        val pended = PendingIntent.getBroadcast(applicationContext,closest.data.num,alarmIntent,PendingIntent.FLAG_CANCEL_CURRENT)
+        am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis() + ChronoUnit.MILLIS.between(LocalDateTime.now(),closest.time), pended),pended)
+    }
+    private fun moveNextDay(day : LocalDateTime, settings: Int):LocalDateTime{
+        Log.v("@@@ moveNextDay function @@@",day.toString())
+        when(day.dayOfWeek){
+            DayOfWeek.MONDAY -> if (settings != settings or (1 shl 0)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.TUESDAY -> if (settings != settings or (1 shl 1)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.WEDNESDAY -> if (settings != settings or (1 shl 2)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.THURSDAY -> if (settings != settings or (1 shl 3)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.FRIDAY -> if (settings != settings or (1 shl 4)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.SATURDAY -> if (settings != settings or (1 shl 5)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.SUNDAY -> if (settings != settings or (1 shl 6)) return moveNextDay(day.plusDays(1), settings)
+        }
+        return day
     }
     override fun onBackPressed() {
-        BackPressHandler(this).onBackPressed()
+        if (snackbar.isShown) snackbar.dismiss()
+        else snackbar.show()
     }
-
     override fun onDestroy() {
         super.onDestroy()
-        Log.v("##################","onDestroy()")
+        timeChecker.interrupt()
     }
 }

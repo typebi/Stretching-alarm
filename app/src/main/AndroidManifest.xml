@@ -35,6 +35,7 @@
             android:label="Add_Alarm"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ProgressPage"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <receiver android:name=".AlarmReceiver"
@@ -47,9 +48,9 @@
         </receiver>
         <receiver android:name=".Dismisser"
             android:exported="false"/>
-        <service android:name=".AlarmSchedulerService"
-            android:permission="android.permission.BIND_JOB_SERVICE">
-        </service>
+<!--        <service android:name=".AlarmSchedulerService"-->
+<!--            android:permission="android.permission.BIND_JOB_SERVICE">-->
+<!--        </service>-->
     </application>
 
 </manifest>

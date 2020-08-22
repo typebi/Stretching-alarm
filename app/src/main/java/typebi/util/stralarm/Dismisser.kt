@@ -4,8 +4,8 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 
+@Suppress("SpellCheckingInspection")
 class Dismisser :BroadcastReceiver(){
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context!=null && intent!=null) {

@@ -8,11 +8,7 @@ import kotlinx.android.synthetic.main.content_main.*
 
 class BackPressHandler(private val activity: MainActivity){
     fun onBackPressed(){
-        Snackbar.make(activity.main_layout, "", Snackbar.LENGTH_LONG)
-            .setActionTextColor(Color.WHITE)
-            .setAction("EXIT"){
-                activity.finish()
-                }
-            .show();
+
+
     }
 }

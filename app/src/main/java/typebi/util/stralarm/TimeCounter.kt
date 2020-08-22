@@ -6,12 +6,12 @@ import android.util.Log
 import kotlinx.android.synthetic.main.content_main.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import kotlin.reflect.typeOf
 
-class TimeCounter(private val context: Context, private var alarmTime: Time):Thread(){
+class TimeCounter(private val context: MainActivity, private var alarmTime: Time, private val i:Int):Thread(){
     override fun run() {
-        val context = context as MainActivity
-        while (!interrupted()){
-            Log.v("#################################","쓰레드 도는 중")
+        while (!currentThread().isInterrupted){
+            Log.v("####################", "쓰레드 도는 중 $i")
             SystemClock.sleep(1000)
             val hour = reviseTime(ChronoUnit.HOURS.between(LocalDateTime.now(), alarmTime.time))
             val min = reviseTime(ChronoUnit.MINUTES.between(LocalDateTime.now(), alarmTime.time) - hour.toInt()*60)
@@ -23,7 +23,7 @@ class TimeCounter(private val context: Context, private var alarmTime: Time):Thr
                 break
             }
             if(ChronoUnit.SECONDS.between(LocalDateTime.now(), alarmTime.time)<=0) {
-                Log.v("###############################","새 쓰레드 호출")
+                Log.v("####################","새 쓰레드 호출")
                 context.makeDisplayThread()
             }
         }

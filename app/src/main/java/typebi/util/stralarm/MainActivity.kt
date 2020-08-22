@@ -154,13 +154,11 @@ class MainActivity : AppCompatActivity() {
                     closestTime = Time(startTime,DTO(alarmList),Time.ALARM_EXISTS)
                     continue
                 }
-                Log.v("@@@ checkClosest @@@","checkClosest 1")
                 if (startTime.isAfter(endTime))//자정에 걸쳐있는지 여부로 분기
                     if (now.isBefore(endTime))
                         startTime = startTime.minusDays(1)
                     else
                         endTime = endTime.plusDays(1)
-                Log.v("@@@ checkClosest @@@","checkClosest 2")
                 //시작시 이전 |--v--(-----)-----|
                 if (now.isBefore(startTime))
                     if(startTime.isBefore(closestTime.time)) {
@@ -168,10 +166,8 @@ class MainActivity : AppCompatActivity() {
                         closestTime = Time(startTime,DTO(alarmList),Time.ALARM_EXISTS)
                         continue
                     }
-                Log.v("@@@ checkClosest @@@","checkClosest 3")
                 //시작시 이후 |-----(--v--)-----|
                 if (now.isAfter(startTime) && now.isBefore(endTime)) {
-                    Log.v("@@@ moveNextDay @@@","시작시 이후")
                     while (startTime.isBefore(now))
                         startTime = startTime.plusMinutes(interval)
                     Log.v("#########2222###########", "시작이후 종료이전 "+startTime.toString())
@@ -201,10 +197,11 @@ class MainActivity : AppCompatActivity() {
             .putExtra("num", closest.data.num)
             .putExtra("title",title)
             .putExtra("content", getString(R.string.noti_content))
-            .setAction("STRETCHING_TIME")
             .putExtra("vibration", vibration)
+            .setAction("STRETCHING_TIME")
         val pended = PendingIntent.getBroadcast(applicationContext,closest.data.num,alarmIntent,PendingIntent.FLAG_CANCEL_CURRENT)
         am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis() + ChronoUnit.MILLIS.between(LocalDateTime.now(),closest.time), pended),pended)
+        Log.v("@@@@","알람 등록 "+((am.nextAlarmClock.triggerTime-System.currentTimeMillis())/1000))
     }
     private fun moveNextDay(day : LocalDateTime, settings: Int):LocalDateTime{
         Log.v("@@@ moveNextDay function @@@",day.toString())

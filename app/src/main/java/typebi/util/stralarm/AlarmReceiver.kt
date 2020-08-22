@@ -8,12 +8,14 @@ import android.util.Log
 
 
 class AlarmReceiver : BroadcastReceiver(){
-    override fun onReceive(context: Context, intent: Intent) {
-        when (intent.action) {
-            "STRETCHING_TIME" -> noteAndsetAlarm(context, intent)
-        }
+    override fun onReceive(context: Context?, intent: Intent?) {
+        Log.v("##################", "리시브 받음")
+        if (context!=null && intent!=null)
+            when (intent.action) {
+                "STRETCHING_TIME" -> notifyAndsetAlarm(context, intent)
+            }
     }
-    private fun noteAndsetAlarm(context: Context, intent: Intent){
+    private fun notifyAndsetAlarm(context: Context, intent: Intent){
         val noti = NotificationHandler(context)
         val title = if(intent.getStringExtra("title")!=null) intent.getStringExtra("title") else "Stretching Alarm"
         val content = if(intent.getStringExtra("content")!=null)  intent.getStringExtra("content") else "Stretch your spine"

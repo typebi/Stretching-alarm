@@ -5,6 +5,7 @@
     <uses-permission android:name = "android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
     <dist:module dist:instant="true" />
 
     <application
@@ -48,9 +49,6 @@
         </receiver>
         <receiver android:name=".Dismisser"
             android:exported="false"/>
-<!--        <service android:name=".AlarmSchedulerService"-->
-<!--            android:permission="android.permission.BIND_JOB_SERVICE">-->
-<!--        </service>-->
     </application>
 
 </manifest>

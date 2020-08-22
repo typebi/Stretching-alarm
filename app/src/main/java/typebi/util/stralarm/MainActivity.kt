@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                         val justInsertedData = db.rawQuery(getString(R.string.selectLatest), null)
                         justInsertedData.moveToNext()
                         alarm_list.removeView(alarm_list.children.last())
-                        alarm_list.addView(makeNewAlarm(justInsertedData))
+                        ViewDrawer(this).addNewAlarmToLayout(DTO(justInsertedData))
                         alarm_list.addView(ViewDrawer(this).addNewBtn())
                         makeDisplayThread()
                         justInsertedData.close()
@@ -115,65 +115,13 @@ class MainActivity : AppCompatActivity() {
         timeChecker = TimeCounter(this, checkClosest())
         timeChecker.start()
     }
-    private fun makeNewAlarm(data : Cursor): TextView{
-        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (110*resources.displayMetrics.density+0.5f).toInt())
-        val dp = (10*resources.displayMetrics.density+0.5f).toInt()
-        params.setMargins(0,dp,0,dp)
-        val fixedSh = if (data.getInt(2)>=12) "PM "+(data.getInt(2)-12)
-        else "AM "+data.getInt(2)
-        val fixedEh = if (data.getInt(4)>=12) "PM "+(data.getInt(4)-12)
-        else "AM "+data.getInt(4)
-        var content = "$fixedSh:"+reviseTime(data.getInt(3))+" ~ $fixedEh:"+reviseTime(data.getInt(5))+"  / "+data.getInt(6)+" m\n월화수목금토일"
-        val alarm = Button(this).apply {
-            setBackgroundResource(R.drawable.border_layout)
-            layoutParams = params
-            gravity = Gravity.CENTER_VERTICAL
-        }
-
-        if (data.getString(1).isNotEmpty()) content = data.getString(1)+"\n$content"
-        alarm.text = content
-        alarm.textSize = 25.toFloat()
-        alarm.setTextColor(Color.parseColor("#000000"))
-        alarm.id = data.getInt(0)
-        val intent = Intent(this, AddAlarm::class.java).apply {
-            putExtra("num", alarm.id)
-            putExtra("name", data.getString(1))
-            putExtra("sh", data.getInt(2))
-            putExtra("sm", data.getInt(3))
-            putExtra("eh", data.getInt(4))
-            putExtra("em", data.getInt(5))
-            putExtra("intvl", data.getInt(6))
-            putExtra("settings", data.getInt(7))
-        }
-        alarm.setOnClickListener{
-            startActivityForResult(intent, 1002)
-        }
-        return alarm
-    }
-    private fun addNewBtn() :ImageButton{
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            (110*resources.displayMetrics.density+0.5f).toInt()
-        )
-        val dp = (10*resources.displayMetrics.density+0.5f).toInt()
-        params.setMargins(0,dp,0,dp)
-        val plusAlarmBtn = ImageButton(this)
-        plusAlarmBtn.layoutParams = params
-        plusAlarmBtn.setBackgroundResource(R.drawable.border_layout)
-        plusAlarmBtn.setImageResource(R.drawable.pointer_cell_large)
-        val intentFromNewbtn = Intent(this, AddAlarm::class.java).putExtra("isNew",true)
-        plusAlarmBtn.setOnClickListener {
-            startActivityForResult(intentFromNewbtn,1001)
-        }
-        return plusAlarmBtn
-    }
     private fun renewAlarms(){
         alarm_list.removeAllViews()
         val alarms = db.rawQuery("select * from STRALARM", null)
         if(alarms.count!=0)
             for (i in 1..alarms.count) {
                 alarms.moveToNext()
-                alarm_list.addView(makeNewAlarm(alarms))
+                ViewDrawer(this).addNewAlarmToLayout(DTO(alarms))
             }
         alarms.close()
         alarm_list.addView(ViewDrawer(this).addNewBtn())

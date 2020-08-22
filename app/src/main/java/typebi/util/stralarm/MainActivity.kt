@@ -85,14 +85,10 @@ class MainActivity : AppCompatActivity() {
                 val settings = data.getIntExtra("settings", 0)
                 when (requestCode) {
                     1001 -> {
-                        db.insert("STRALARM",null, makeDataRow(name, sh, sm, eh, em, intvl, settings))
-                        val justInsertedData = db.rawQuery(getString(R.string.selectLatest), null)
-                        justInsertedData.moveToNext()
                         alarm_list.removeView(alarm_list.children.last())
-                        ViewDrawer(this).addNewAlarmToLayout(DTO(justInsertedData))
+                        ViewDrawer(this).addNewAlarmToLayout(DB.insertAlarm(data, getString(R.string.selectLatest)))
                         alarm_list.addView(ViewDrawer(this).addNewBtn())
                         makeDisplayThread()
-                        justInsertedData.close()
                     }
                     1002 -> {
                         db.update("STRALARM", makeDataRow(name, sh, sm, eh, em, intvl, settings), "NUM = ?", arrayOf(num.toString()))

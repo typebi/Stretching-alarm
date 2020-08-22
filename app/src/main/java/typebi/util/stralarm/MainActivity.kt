@@ -17,6 +17,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.content_main.*
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -89,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                         justInsertedData.moveToNext()
                         alarm_list.removeView(alarm_list.children.last())
                         alarm_list.addView(makeNewAlarm(justInsertedData))
-                        alarm_list.addView(addNewBtn())
+                        alarm_list.addView(ViewDrawer(this).addNewBtn())
                         makeDisplayThread()
                         justInsertedData.close()
                     }
@@ -175,7 +176,7 @@ class MainActivity : AppCompatActivity() {
                 alarm_list.addView(makeNewAlarm(alarms))
             }
         alarms.close()
-        alarm_list.addView(addNewBtn())
+        alarm_list.addView(ViewDrawer(this).addNewBtn())
     }
     private fun makeDataRow(name:String?, sh:Int, sm:Int, eh:Int, em:Int,intvl:Int, settings:Int) :ContentValues{
         val cv = ContentValues()
@@ -255,6 +256,19 @@ class MainActivity : AppCompatActivity() {
             renewAlarms()
         }
         return switch
+    }
+    private fun moveNextDay(day : LocalDateTime, settings: Int):LocalDateTime{
+        Log.v("@@@ moveNextDay function @@@",day.toString())
+        when(day.dayOfWeek){
+            DayOfWeek.MONDAY -> if (settings != settings or (1 shl 0)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.TUESDAY -> if (settings != settings or (1 shl 1)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.WEDNESDAY -> if (settings != settings or (1 shl 2)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.THURSDAY -> if (settings != settings or (1 shl 3)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.FRIDAY -> if (settings != settings or (1 shl 4)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.SATURDAY -> if (settings != settings or (1 shl 5)) return moveNextDay(day.plusDays(1), settings)
+            DayOfWeek.SUNDAY -> if (settings != settings or (1 shl 6)) return moveNextDay(day.plusDays(1), settings)
+        }
+        return day
     }
     private fun reviseTime(time:Int) :String{
         return if(time<10) "0$time"

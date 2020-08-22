@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }else{
-                db.execSQL("delete from STRALARM where num=$num")
+                DB.deleteAlarm(data)
                 val alarmIntent = Intent(this, AlarmReceiver::class.java).putExtra("num",num)
                 val pender = PendingIntent.getBroadcast(this, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
                 am.cancel(pender)

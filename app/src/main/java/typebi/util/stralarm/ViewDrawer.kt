@@ -15,8 +15,8 @@ import androidx.core.view.children
 import kotlinx.android.synthetic.main.alarm.view.*
 import kotlinx.android.synthetic.main.content_main.*
 
-class ViewDrawer(private val mainActivity : MainActivity) {
-    fun addNewBtn() : ImageButton {
+class ViewDrawer {
+    fun addNewBtn(mainActivity : MainActivity) : ImageButton {
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             (110*mainActivity.resources.displayMetrics.density+0.5f).toInt()
@@ -33,14 +33,14 @@ class ViewDrawer(private val mainActivity : MainActivity) {
         }
         return plusAlarmBtn
     }
-    fun addNewAlarmToLayout(data : DTO){
+    fun addNewAlarmToLayout(mainActivity : MainActivity, data : DTO){
         val fixedSh = if (data.startHour>=12) "PM"+(data.startHour-12) else "AM"+data.startHour
         val fixedEh = if (data.endHour>=12) "PM"+(data.endHour-12) else "AM"+data.endHour
         val content = "$fixedSh:"+reviseTime(data.startMin)+" ~ $fixedEh:"+reviseTime(data.endMin)+"  간격:"+data.interval+"분\n월화수목금토일"
         val layoutInflater = mainActivity.getSystemService(AppCompatActivity.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         layoutInflater.inflate(R.layout.alarm,mainActivity.alarm_list,true)
         if (data.name.isNotEmpty()) mainActivity.alarm_list.children.last().innerLayout.alarm_name.text = data.name
-        mainActivity.alarm_list.children.last().innerLayout.content.text = setStringStyle(content, data.settings)
+        mainActivity.alarm_list.children.last().innerLayout.content.text = setStringStyle(mainActivity, content, data.settings)
         mainActivity.alarm_list.children.last().outerLayout.addView(mainActivity.makeSwitch(data))
         val intent = Intent(mainActivity, AddAlarm::class.java).apply {
             putExtra("num", data.num)
@@ -56,7 +56,7 @@ class ViewDrawer(private val mainActivity : MainActivity) {
             mainActivity.startActivityForResult(intent, 1002)
         }
     }
-    private fun setStringStyle(text : String, settings: Int) : SpannableString {
+    private fun setStringStyle(mainActivity : MainActivity, text : String, settings: Int) : SpannableString {
         val spannableString = SpannableString(text)
         if (text.contains("AM")) {
             spannableString.setSpan(RelativeSizeSpan(0.5f), text.indexOf("AM"), text.indexOf("AM") + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

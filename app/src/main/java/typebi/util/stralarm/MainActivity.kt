@@ -51,10 +51,6 @@ class MainActivity : AppCompatActivity() {
             this.finish()
         }
     }
-    override fun onStart() {
-        super.onStart()
-        Log.v("%%%%%%%%%%%%%%%%%%%","onStart() 실행")
-    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -73,22 +69,11 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data!=null) {
-            val isDelete = data.getBooleanExtra("isDelete",false)
-            val num = data.getIntExtra("num", 0)
-            if (isDelete) {
-                DB.deleteAlarm(data)
-                val alarmIntent = Intent(this, AlarmReceiver::class.java).putExtra("num",num)
-                val pended = PendingIntent.getBroadcast(this, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-                am.cancel(pended)
-                makeDisplayThread()
-                renewAlarms()
-                return
-            }
             when (requestCode) {
                 1001 -> {
                     alarm_list.removeView(alarm_list.children.last())
-                    ViewDrawer(this).addNewAlarmToLayout(DB.insertAlarm(data, getString(R.string.selectLatest)))
-                    alarm_list.addView(ViewDrawer(this).addNewBtn())
+                    ViewDrawer().addNewAlarmToLayout(this, DB.insertAlarm(data, getString(R.string.selectLatest)))
+                    alarm_list.addView(ViewDrawer().addNewBtn(this))
                     makeDisplayThread()
                 }
                 1002 -> {
@@ -97,6 +82,13 @@ class MainActivity : AppCompatActivity() {
                     renewAlarms()
                 }
             }
+        }else if (resultCode == Activity.RESULT_CANCELED && data!=null){
+            DB.deleteAlarm(data)
+            val alarmIntent = Intent(this, AlarmReceiver::class.java)
+            val pended = PendingIntent.getBroadcast(this, data.getIntExtra("num",-1), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+            am.cancel(pended)
+            makeDisplayThread()
+            renewAlarms()
         }
     }
     fun makeDisplayThread(){
@@ -108,9 +100,9 @@ class MainActivity : AppCompatActivity() {
         alarm_list.removeAllViews()
         DB.selectAlarms().use {
             while (it.moveToNext())
-                ViewDrawer(this).addNewAlarmToLayout(DTO(it))
+                ViewDrawer().addNewAlarmToLayout(this, DTO(it))
         }
-        alarm_list.addView(ViewDrawer(this).addNewBtn())
+        alarm_list.addView(ViewDrawer().addNewBtn(this))
     }
     private fun checkClosest() : Time {
         var closestTime = Time(LocalDateTime.now().plusYears(5),DTO(-1,"",-1,-1,-1,-1,-1,-1),Time.NO_ALARMS)
@@ -187,16 +179,7 @@ class MainActivity : AppCompatActivity() {
         }
         return day
     }
-    private fun reviseTime(time:Int) :String{
-        return if(time<10) "0$time"
-        else time.toString()
-    }
     override fun onBackPressed() {
         BackPressHandler(this).onBackPressed()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.v("##################","onDestroy()")
     }
 }

@@ -1,10 +1,11 @@
+@file:Suppress("SpellCheckingInspection")
+
 package typebi.util.stralarm
 
 import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.util.Log
 
 class DBAccesser(private val DB : SQLiteDatabase) {
     private val tableName = "STRALARM"

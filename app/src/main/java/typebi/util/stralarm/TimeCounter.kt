@@ -7,9 +7,8 @@ import kotlinx.android.synthetic.main.content_main.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
-class TimeCounter(private val context: Context, private var alarmTime: Time):Thread(){
+class TimeCounter(private val context: MainActivity, private var alarmTime: Time):Thread(){
     override fun run() {
-        val context = context as MainActivity
         while (!currentThread().isInterrupted){
             if (alarmTime.state == Time.NO_ALARMS) {
                 context.time_display.text = context.getString(R.string.alarm_display_no_alarm)

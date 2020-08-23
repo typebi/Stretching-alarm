@@ -17,52 +17,49 @@ class AddAlarm : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_alarm)
-        time_interval.minValue=1
-        time_interval.maxValue=1440
-        time_interval.value=intent.getIntExtra("intvl",15)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            time_start.hour = intent.getIntExtra("sh",9)
-            time_start.minute = intent.getIntExtra("sm",0)
-            time_end.hour = intent.getIntExtra("eh",18)
-            time_end.minute = intent.getIntExtra("em",0)
-        }
-        val settings = arrayOf(day1, day2, day3, day4, day5, day6, day7, switch_ring, switch_vibe)
-        for (i in 0 .. 4)
-            settings[i].isChecked = true
-        if(intent.getBooleanExtra("isNew", false))
-            btn_delete.visibility = View.INVISIBLE;
-        switch_vibe.isChecked =  true
+        time_interval.minValue = 1
+        time_interval.maxValue = 1440
+        time_interval.value = intent.getIntExtra("intvl",15)
+        time_start.hour = intent.getIntExtra("sh",9)
+        time_start.minute = intent.getIntExtra("sm",0)
+        time_end.hour = intent.getIntExtra("eh",18)
+        time_end.minute = intent.getIntExtra("em",0)
+        var settings = intent.getIntExtra("settings",0)
+
+        val settingViews = arrayOf(day1, day2, day3, day4, day5, day6, day7, switch_ring, switch_vibe)
+        if(intent.getBooleanExtra("isNew", false)) {
+            btn_delete.visibility = View.INVISIBLE
+            switch_vibe.isChecked =  true
+            for (i in 0 .. 4)
+                settingViews[i].isChecked = true
+        }else
+            for (i in 0 .. 8)
+                if (settings == settings or (1 shl i))
+                    settingViews[i].isChecked = true
+
         val num = intent.getIntExtra("num",0)
-        var name = intent.getStringExtra("name")
-        if (name!=null)
-            alarm_name.setText(name, TextView.BufferType.EDITABLE)
+        if (intent.getStringExtra("name")!=null)
+            alarm_name.setText(intent.getStringExtra("name"), TextView.BufferType.EDITABLE)
         btn_add.setOnClickListener {
-            name = alarm_name.text.toString()
-            var setting = 0b0
-            for (compo in settings){
-                if (compo.isChecked){
-                    val idx = settings.indexOf(compo)
-                    setting = setting or (1 shl idx)
-                }
-            }
-            Log.v("#########################",setting.toString(2))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                intent.putExtra("isDelete",false)
-                intent.putExtra("num", num)
-                intent.putExtra("name", name)
-                intent.putExtra("startHour", time_start.hour)
-                intent.putExtra("startMin", time_start.minute)
-                intent.putExtra("endHour", time_end.hour)
-                intent.putExtra("endMin", time_end.minute)
-                intent.putExtra("intvl", time_interval.value)
-                intent.putExtra("settings", setting)
-                setResult(Activity.RESULT_OK, intent)
-                finish()
-            }
+            settings = 0
+            for (set in settingViews)
+                if (set.isChecked)
+                    settings = settings or (1 shl settingViews.indexOf(set))
+            intent.putExtra("isDelete",false)
+                .putExtra("num", num)
+                .putExtra("name", alarm_name.text.toString())
+                .putExtra("startHour", time_start.hour)
+                .putExtra("startMin", time_start.minute)
+                .putExtra("endHour", time_end.hour)
+                .putExtra("endMin", time_end.minute)
+                .putExtra("intvl", time_interval.value)
+                .putExtra("settings", settings)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
         btn_delete.setOnClickListener {
-            intent.putExtra("isDelete",true)
-            setResult(Activity.RESULT_OK, intent)
+            intent.putExtra("num", num)
+            setResult(Activity.RESULT_CANCELED, intent)
             finish()
         }
     }

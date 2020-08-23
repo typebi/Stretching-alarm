@@ -1,12 +1,7 @@
 package typebi.util.stralarm
 
 import android.app.*
-import android.content.ContentValues
 import android.content.Intent
-import android.content.IntentFilter
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.view.*
@@ -23,13 +18,11 @@ import java.time.temporal.ChronoUnit
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var db:SQLiteDatabase
+    private lateinit var mAdView : AdView
+    @property:Suppress("PrivatePropertyName")
+    private val DB : DBAccesser by lazy { DBAccesser(this) }
+    private val am : AlarmManager by lazy { getSystemService(ALARM_SERVICE) as AlarmManager }
     private lateinit var timeChecker:TimeCounter
-    lateinit var mAdView : AdView
-    private val DB : DBAccesser by lazy { DBAccesser(openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)) }
-    private val am : AlarmManager by lazy {
-        getSystemService(ALARM_SERVICE) as AlarmManager
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,24 +32,27 @@ class MainActivity : AppCompatActivity() {
         mAdView.loadAd(adRequest)
         Log.v("@@@@@@@@@@@@@@@@@","onCreate() 실행")
         DB.createTable(getString(R.string.createTable))
-        db = openOrCreateDatabase("stretchingAlarm",MODE_PRIVATE, null)
-        timeChecker = TimeCounter(this, checkClosest())
-        timeChecker.start()
         renewAlarms()
         testBtn.setOnClickListener{
             startActivity(Intent(this, ProgressPage::class.java))
         }
+        timeChecker = TimeCounter(this, checkClosest())
+        timeChecker.start()
         if (intent.getBooleanExtra("isDoze",false)) {
             timeChecker.interrupt()
             this.finish()
         }
+    }
+    fun makeDisplayThread(){
+        timeChecker.interrupt()
+        timeChecker = TimeCounter(this, checkClosest())
+        timeChecker.start()
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -85,16 +81,11 @@ class MainActivity : AppCompatActivity() {
         }else if (resultCode == Activity.RESULT_CANCELED && data!=null){
             DB.deleteAlarm(data)
             val alarmIntent = Intent(this, AlarmReceiver::class.java)
-            val pended = PendingIntent.getBroadcast(this, data.getIntExtra("num",-1), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+            val pended = PendingIntent.getBroadcast(applicationContext, data.getIntExtra("num",-1), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
             am.cancel(pended)
             makeDisplayThread()
             renewAlarms()
         }
-    }
-    fun makeDisplayThread(){
-        timeChecker.interrupt()
-        timeChecker = TimeCounter(this, checkClosest())
-        timeChecker.start()
     }
     private fun renewAlarms(){
         alarm_list.removeAllViews()
@@ -128,17 +119,15 @@ class MainActivity : AppCompatActivity() {
                 if (alarmTime.isBefore(closestTime.time)) { //가장 가까운 알람시간 갱신
                     closestTime = Time(alarmTime, DTO(it), Time.ALARM_EXISTS)
                 }
-
-                val alarmIntent = Intent(this, AlarmReceiver::class.java)
-                    .putExtra("num",it.getInt(0))
-                    .putExtra("title",getString(R.string.noti_title))
-                    .putExtra("content",getString(R.string.noti_content))
-                //if (closestAlarmTitle.isNotEmpty()) alarmIntent.putExtra("title",closestAlarmTitle)
-                val pended = PendingIntent.getBroadcast(this, it.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-                am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime.time),pended),pended)
-                Log.v("###############################","알람 셋팅 closestTime: "+ closestTime+ " , 차이1 : "+ChronoUnit.MILLIS.between(today, closestTime.time))
             }
         }
+        val alarmIntent = Intent(this, AlarmReceiver::class.java)
+            .putExtra("num",closestTime.data.num)
+            .putExtra("title",getString(R.string.noti_title))
+            .putExtra("content",getString(R.string.noti_content))
+        val pended = PendingIntent.getBroadcast(applicationContext, closestTime.data.num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime.time),pended),pended)
+        Log.v("###############################","알람 셋팅 closestTime: "+ closestTime+ " , 차이1 : "+ChronoUnit.MILLIS.between(today, closestTime.time))
         return closestTime
     }
     fun makeSwitch(data : DTO) : Switch {
@@ -181,5 +170,9 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
         BackPressHandler(this).onBackPressed()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        timeChecker.interrupt()
     }
 }

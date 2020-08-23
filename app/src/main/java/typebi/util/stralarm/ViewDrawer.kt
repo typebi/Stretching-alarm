@@ -16,20 +16,21 @@ import kotlinx.android.synthetic.main.alarm.view.*
 import kotlinx.android.synthetic.main.content_main.*
 
 class ViewDrawer {
-    fun addNewBtn(mainActivity : MainActivity) : ImageButton {
+    fun addNewBtn(main : MainActivity) : ImageButton {
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            (110*mainActivity.resources.displayMetrics.density+0.5f).toInt()
+            (110*main.resources.displayMetrics.density+0.5f).toInt()
         )
-        val dp = (10*mainActivity.resources.displayMetrics.density+0.5f).toInt()
+        val dp = (10*main.resources.displayMetrics.density+0.5f).toInt()
         params.setMargins(0,dp,0,dp)
-        val plusAlarmBtn = ImageButton(mainActivity)
-        plusAlarmBtn.layoutParams = params
-        plusAlarmBtn.setBackgroundResource(R.drawable.border_layout)
-        plusAlarmBtn.setImageResource(R.drawable.pointer_cell_large)
-        val intentFromNewbtn = Intent(mainActivity, AddAlarm::class.java).putExtra("isNew",true)
+        val plusAlarmBtn = ImageButton(main).apply {
+            layoutParams = params
+            setBackgroundResource(R.drawable.border_layout)
+            setImageResource(R.drawable.pointer_cell_large)
+        }
+        val intentFromNewbtn = Intent(main, AddAlarm::class.java).putExtra("isNew",true)
         plusAlarmBtn.setOnClickListener {
-            mainActivity.startActivityForResult(intentFromNewbtn,1001)
+            main.startActivityForResult(intentFromNewbtn,1001)
         }
         return plusAlarmBtn
     }

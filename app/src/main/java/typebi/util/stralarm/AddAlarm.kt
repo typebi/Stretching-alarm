@@ -45,6 +45,7 @@ class AddAlarm : AppCompatActivity(){
             for (set in settingViews)
                 if (set.isChecked)
                     settings = settings or (1 shl settingViews.indexOf(set))
+            settings = settings or (1 shl 9)
             intent.putExtra("isDelete",false)
                 .putExtra("num", num)
                 .putExtra("name", alarm_name.text.toString())

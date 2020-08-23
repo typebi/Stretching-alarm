@@ -5,9 +5,10 @@ package typebi.util.stralarm
 import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
+import androidx.appcompat.app.AppCompatActivity
 
-class DBAccesser(private val DB : SQLiteDatabase) {
+class DBAccesser(private val main: MainActivity) {
+    private val DB = main.openOrCreateDatabase("stretchingAlarm", AppCompatActivity.MODE_PRIVATE, null)
     private val tableName = "STRALARM"
     private val selectAllStatement = "select * from STRALARM"
     private val updateWhereClause = "NUM = ?"

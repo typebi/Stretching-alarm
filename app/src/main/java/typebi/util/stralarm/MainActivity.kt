@@ -96,39 +96,16 @@ class MainActivity : AppCompatActivity() {
         alarm_list.addView(ViewDrawer().addNewBtn(this))
     }
     private fun checkClosest() : Time {
-        var closestTime = Time(LocalDateTime.now().plusYears(5),DTO(-1,"",-1,-1,-1,-1,-1,-1),Time.NO_ALARMS)
-        val today = LocalDateTime.now().plusSeconds(1)
-        DB.selectAlarms().use {
-            while (it.moveToNext()) {
-                val interval : Long = it.getLong(6)
-                val setting = it.getInt(7)
-                if (setting != setting or (1 shl 9)) continue
-                if (setting == (setting shr 7) shl 7) continue
-                var alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,it.getInt(2), it.getInt(3),0)
-                val alarmTimeEnd = LocalDateTime.of(today.year, today.month, today.dayOfMonth,it.getInt(4), it.getInt(5),0)
-                if(alarmTime.isAfter(alarmTimeEnd) && today.isAfter(alarmTimeEnd)) // 알람시작시가 종료시보다 후인경우, 종료시는 다음날 그 시각으로 설정 && 현시각이 알람종료시 이후인 경우에만(ex. 현시 새벽1시, 알람새벽2시종료)
-                    alarmTimeEnd.plusDays(1)
-                if(alarmTimeEnd.isBefore(today)) //알람종료시가 현시각보다 전이면, 알람시각은 알람시작시+1일
-                    alarmTime.plusDays(1)
-                else //알람종료시가 현시각보다 뒤면, 1. 현시각은 알람시작시 이전이거나 2. 알람기간 내에 위치
-                    if(alarmTime.isAfter(alarmTimeEnd)) // 알람종료시가 현시각 이후지만, 알람시작시가 어제인 경우 (ex. 현시 새벽1시, 알람종료시 새벽2시)
-                        alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,0, 0,0)
-                while(alarmTime.isBefore(today)) // 알람시작시가 현시각보다 이전이면 (알람기간 내 위치)
-                    alarmTime = alarmTime.plusMinutes(interval)
-
-                if (alarmTime.isBefore(closestTime.time)) { //가장 가까운 알람시간 갱신
-                    closestTime = Time(alarmTime, DTO(it), Time.ALARM_EXISTS)
-                }
-            }
-        }
+        var closest = ClosestChecker(this).check(DB.selectAlarms())
+        val now = LocalDateTime.now().plusSeconds(1)
         val alarmIntent = Intent(this, AlarmReceiver::class.java)
-            .putExtra("num",closestTime.data.num)
+            .putExtra("num",closest.data.num)
             .putExtra("title",getString(R.string.noti_title))
             .putExtra("content",getString(R.string.noti_content))
-        val pended = PendingIntent.getBroadcast(applicationContext, closestTime.data.num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-        am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime.time),pended),pended)
-        Log.v("###############################","알람 셋팅 closestTime: "+ closestTime+ " , 차이1 : "+ChronoUnit.MILLIS.between(today, closestTime.time))
-        return closestTime
+        val pended = PendingIntent.getBroadcast(applicationContext, closest.data.num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(now, closest.time),pended),pended)
+        Log.v("###############################","알람 셋팅")
+        return closest
     }
     fun makeSwitch(data : DTO) : Switch {
         val params = LinearLayout.LayoutParams(
@@ -154,19 +131,6 @@ class MainActivity : AppCompatActivity() {
             renewAlarms()
         }
         return switch
-    }
-    private fun moveNextDay(day : LocalDateTime, settings: Int):LocalDateTime{
-        Log.v("@@@ moveNextDay function @@@",day.toString())
-        when(day.dayOfWeek){
-            DayOfWeek.MONDAY -> if (settings != settings or (1 shl 0)) return moveNextDay(day.plusDays(1), settings)
-            DayOfWeek.TUESDAY -> if (settings != settings or (1 shl 1)) return moveNextDay(day.plusDays(1), settings)
-            DayOfWeek.WEDNESDAY -> if (settings != settings or (1 shl 2)) return moveNextDay(day.plusDays(1), settings)
-            DayOfWeek.THURSDAY -> if (settings != settings or (1 shl 3)) return moveNextDay(day.plusDays(1), settings)
-            DayOfWeek.FRIDAY -> if (settings != settings or (1 shl 4)) return moveNextDay(day.plusDays(1), settings)
-            DayOfWeek.SATURDAY -> if (settings != settings or (1 shl 5)) return moveNextDay(day.plusDays(1), settings)
-            DayOfWeek.SUNDAY -> if (settings != settings or (1 shl 6)) return moveNextDay(day.plusDays(1), settings)
-        }
-        return day
     }
     override fun onBackPressed() {
         BackPressHandler(this).onBackPressed()

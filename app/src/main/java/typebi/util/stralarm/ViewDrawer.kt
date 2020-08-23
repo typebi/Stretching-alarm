@@ -35,8 +35,8 @@ class ViewDrawer {
         return plusAlarmBtn
     }
     fun addNewAlarmToLayout(mainActivity : MainActivity, data : DTO){
-        val fixedSh = if (data.startHour>=12) "PM"+(data.startHour-12) else "AM"+data.startHour
-        val fixedEh = if (data.endHour>=12) "PM"+(data.endHour-12) else "AM"+data.endHour
+        val fixedSh = if (data.startHour>12) "PM"+(data.startHour-12) else "AM"+data.startHour
+        val fixedEh = if (data.endHour>12) "PM"+(data.endHour-12) else "AM"+data.endHour
         val content = "$fixedSh:"+reviseTime(data.startMin)+" ~ $fixedEh:"+reviseTime(data.endMin)+"  간격:"+data.interval+"분\n월화수목금토일"
         val layoutInflater = mainActivity.getSystemService(AppCompatActivity.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         layoutInflater.inflate(R.layout.alarm,mainActivity.alarm_list,true)

@@ -1,127 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- 삭제버튼 ...으로 바꾸기 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:gravity="right">
-        <Button android:id="@+id/btn_delete"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="25dp"
-            android:text="삭제"/>
-    </LinearLayout>
-    <LinearLayout
-        style="@style/addAlarmContainer">
-        <TimePicker android:id="@+id/time_start"
-            style="@style/addAlarmPicker"/>
-        <TextView
-            style="@style/addAlarmText"
-            android:text="@string/time_start"/>
-    </LinearLayout>
-    <LinearLayout
-        style="@style/addAlarmContainer">
-        <TimePicker android:id="@+id/time_end"
-            style="@style/addAlarmPicker"/>
-        <TextView
-            style="@style/addAlarmText"
-            android:text="@string/time_end"/>
-    </LinearLayout>
-    <LinearLayout
-        style="@style/addAlarmContainer">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginBottom="100dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="end">
+            <Button android:id="@+id/btn_delete"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="25dp"
+                android:text="@string/delete_button"/>
+        </LinearLayout>
+        <LinearLayout
+            style="@style/addAlarmContainer">
+            <TimePicker android:id="@+id/time_start"
+                style="@style/addAlarmPicker"/>
+            <TextView
+                style="@style/addAlarmText"
+                android:text="@string/time_start"/>
+        </LinearLayout>
+        <LinearLayout
+            style="@style/addAlarmContainer">
+            <TimePicker android:id="@+id/time_end"
+                style="@style/addAlarmPicker"/>
+            <TextView
+                style="@style/addAlarmText"
+                android:text="@string/time_end"/>
+        </LinearLayout>
+        <LinearLayout
+            style="@style/addAlarmContainer">
+            <LinearLayout
+                style="@style/addAlarmContainer"
+                android:layout_width="0dp"
+                android:layout_weight="6">
+                <NumberPicker android:id="@+id/time_interval"
+                    android:layout_width="50dp"
+                    android:layout_height="150dp"/>
+            </LinearLayout>
+            <TextView
+                style="@style/addAlarmText"
+                android:layout_weight="3"
+                android:text="@string/time_interval_unit">
+            </TextView>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="10">
+            <EditText android:id="@+id/alarm_name"
+                android:layout_width="0dp"
+                android:layout_height="75dp"
+                android:layout_weight="10"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="10dp"
+                android:maxLength="20"
+                android:singleLine="true"
+                android:hint="@string/name_hint"
+                android:autofillHints="@string/name_hint"
+                android:inputType="text">
+            </EditText>
+        </LinearLayout>
         <LinearLayout
             style="@style/addAlarmContainer"
-            android:layout_width="0dp"
-            android:layout_weight="6">
-            <NumberPicker android:id="@+id/time_interval"
-                android:layout_width="50dp"
-                android:layout_height="150dp"/>
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="center">
+            <CheckBox android:id="@+id/day1"
+                style="@style/dayOfWeekChecker"
+                android:text="@string/day_of_weak_1">
+            </CheckBox>
+            <CheckBox android:id="@+id/day2"
+                style="@style/dayOfWeekChecker"
+                android:text="@string/day_of_weak_2">
+            </CheckBox>
+            <CheckBox android:id="@+id/day3"
+                style="@style/dayOfWeekChecker"
+                android:text="@string/day_of_weak_3">
+            </CheckBox>
+            <CheckBox android:id="@+id/day4"
+                style="@style/dayOfWeekChecker"
+                android:text="@string/day_of_weak_4">
+            </CheckBox>
+            <CheckBox android:id="@+id/day5"
+                style="@style/dayOfWeekChecker"
+                android:text="@string/day_of_weak_5">
+            </CheckBox>
+            <CheckBox android:id="@+id/day6"
+                style="@style/dayOfWeekChecker"
+                android:textColor="#3F51B5"
+                android:text="@string/day_of_weak_6">
+            </CheckBox>
+            <CheckBox android:id="@+id/day7"
+                style="@style/dayOfWeekChecker"
+                android:textColor="#F44336"
+                android:text="@string/day_of_weak_7">
+            </CheckBox>
         </LinearLayout>
-        <TextView
-            style="@style/addAlarmText"
-            android:layout_weight="3"
-            android:text="@string/time_interval_unit">
-        </TextView>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="10">
-        <EditText android:id="@+id/alarm_name"
-            android:layout_width="0dp"
-            android:layout_height="75dp"
-            android:layout_weight="10"
-            android:layout_marginLeft="15dp"
+        <LinearLayout
+            style="@style/addAlarmContainer"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:maxLength="20"
-            android:singleLine="true"
-            android:hint="알람 이름">
-        </EditText>
+            android:gravity="start">
+            <Switch android:id="@+id/switch_ring"
+                style="@style/addAlarmSettings"
+                android:text="@string/bell_setting"
+                android:visibility="invisible"/>
+            <Switch android:id="@+id/switch_vibe"
+                style="@style/addAlarmSettings"
+                android:text="@string/vibration_setting"/>
+        </LinearLayout>
+        <LinearLayout
+            style="@style/addAlarmContainer"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="end">
+            <Button android:id="@+id/btn_add"
+                android:layout_marginEnd="25dp"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="@string/confirm_button"/>
+        </LinearLayout>
     </LinearLayout>
-    <LinearLayout
-        style="@style/addAlarmContainer"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:gravity="center">
-        <CheckBox android:id="@+id/day1"
-            style="@style/dayOfWeekChecker"
-            android:text="월">
-        </CheckBox>
-        <CheckBox android:id="@+id/day2"
-            style="@style/dayOfWeekChecker"
-            android:text="화">
-        </CheckBox>
-        <CheckBox android:id="@+id/day3"
-            style="@style/dayOfWeekChecker"
-            android:text="수">
-        </CheckBox>
-        <CheckBox android:id="@+id/day4"
-            style="@style/dayOfWeekChecker"
-            android:text="목">
-        </CheckBox>
-        <CheckBox android:id="@+id/day5"
-            style="@style/dayOfWeekChecker"
-            android:text="금">
-        </CheckBox>
-        <CheckBox android:id="@+id/day6"
-            style="@style/dayOfWeekChecker"
-            android:textColor="#3F51B5"
-            android:text="토">
-        </CheckBox>
-        <CheckBox android:id="@+id/day7"
-            style="@style/dayOfWeekChecker"
-            android:textColor="#F44336"
-            android:text="일">
-        </CheckBox>
-    </LinearLayout>
-    <LinearLayout
-        style="@style/addAlarmContainer"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:gravity="left">
-        <Switch android:id="@+id/switch_ring"
-            style="@style/addAlarmSettings"
-            android:text="@string/bell_setting"
-            android:visibility="invisible"/>
-        <Switch android:id="@+id/switch_vibe"
-            style="@style/addAlarmSettings"
-            android:text="@string/vibration_setting"/>
-    </LinearLayout>
-    <LinearLayout
-        style="@style/addAlarmContainer"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:gravity="right">
-        <Button android:id="@+id/btn_add"
-            android:layout_marginRight="25dp"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:text="저장"/>
-    </LinearLayout>
-</LinearLayout>
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/admob_2"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom"
+        android:background="#FFFFFF"
+        ads:adSize="LARGE_BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
+</FrameLayout>

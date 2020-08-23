@@ -35,11 +35,12 @@
                 android:src="@drawable/perm_group_system_tools"
                 android:contentDescription="@string/setting_image_description"
                 android:translationZ="1dp"
-                android:visibility="visible"/>
+                android:visibility="invisible"/>
         </LinearLayout>
         <TextView android:id="@+id/time_display"
             android:layout_width="match_parent"
             android:layout_height="230dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
             android:textColor="@color/textColor_1"
             android:textSize="50sp"

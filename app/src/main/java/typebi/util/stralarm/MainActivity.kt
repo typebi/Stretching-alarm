@@ -2,6 +2,7 @@ package typebi.util.stralarm
 
 import android.app.*
 import android.content.Intent
+import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.view.*
@@ -11,6 +12,7 @@ import androidx.core.view.children
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 import java.time.LocalDateTime
@@ -23,6 +25,13 @@ class MainActivity : AppCompatActivity() {
     private val DB : DBAccesser by lazy { DBAccesser(this) }
     private val am : AlarmManager by lazy { getSystemService(ALARM_SERVICE) as AlarmManager }
     private lateinit var timeChecker:TimeCounter
+    private val snackbar by lazy {
+        Snackbar.make(main_layout, "", Snackbar.LENGTH_LONG)
+            .setActionTextColor(Color.WHITE)
+            .setAction("EXIT"){
+                finish()
+            }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -138,7 +147,8 @@ class MainActivity : AppCompatActivity() {
         return switch
     }
     override fun onBackPressed() {
-        BackPressHandler(this).onBackPressed()
+        if (snackbar.isShown) snackbar.dismiss()
+        else snackbar.show()
     }
     override fun onDestroy() {
         super.onDestroy()

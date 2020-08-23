@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Stretching Alarm</string>
+    <string name="app_name">스트레칭 알람</string>
     <string name="action_settings_1">White (Default)</string>
     <string name="action_settings_2">Blue</string>
     <string name="action_settings_3">Pink</string>
@@ -25,12 +25,22 @@
     <string name="noti_title">스트레칭 할 시간이에요</string>
     <string name="noti_content">지금 하면 15초, 안 하면 디스크 박살</string>
 
+    <string name="delete_button">삭제</string>
     <string name="time_start">부터</string>
     <string name="time_end">까지</string>
     <string name="time_interval">간격</string>
     <string name="time_interval_unit">분 간격</string>
+    <string name="name_hint">알람 이름</string>
     <string name="bell_setting">벨소리</string>
     <string name="vibration_setting">진동</string>
+    <string name="day_of_weak_1">월</string>
+    <string name="day_of_weak_2">화</string>
+    <string name="day_of_weak_3">수</string>
+    <string name="day_of_weak_4">목</string>
+    <string name="day_of_weak_5">금</string>
+    <string name="day_of_weak_6">토</string>
+    <string name="day_of_weak_7">일</string>
+    <string name="confirm_button">저장</string>
 
     <string name="progress_start">START</string>
     <string name="progress_exit">EXIT</string>

@@ -112,28 +112,17 @@ class MainActivity : AppCompatActivity() {
         }
         alarm_list.addView(ViewDrawer(this).addNewBtn())
     }
-    private fun makeDataRow(name:String?, sh:Int, sm:Int, eh:Int, em:Int,intvl:Int, settings:Int) :ContentValues{
-        val cv = ContentValues()
-        cv.put("NAME", name)
-        cv.put("START_H", sh)
-        cv.put("START_M", sm)
-        cv.put("END_H", eh)
-        cv.put("END_M", em)
-        cv.put("INTERVAL", intvl)
-        cv.put("SETTINGS",settings)
-        return cv
-    }
     private fun checkClosest() : Time {
-        var closestTime = LocalDateTime.now().plusYears(5)
-        lateinit var closestAlarmTitle : String
+        var closestTime = Time(LocalDateTime.now().plusYears(5),DTO(-1,"",-1,-1,-1,-1,-1,-1),Time.NO_ALARMS)
         val today = LocalDateTime.now().plusSeconds(1)
-        val alarms = DB.selectAlarms()
-        if (alarms.count != 0) {
-            for (i in 1..alarms.count) {
-                alarms.moveToNext()
-                val interval : Long = alarms.getLong(6)
-                var alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,alarms.getInt(2), alarms.getInt(3),0)
-                val alarmTimeEnd = LocalDateTime.of(today.year, today.month, today.dayOfMonth,alarms.getInt(4), alarms.getInt(5),0)
+        DB.selectAlarms().use {
+            while (it.moveToNext()) {
+                val interval : Long = it.getLong(6)
+                val setting = it.getInt(7)
+                if (setting != setting or (1 shl 9)) continue
+                if (setting == (setting shr 7) shl 7) continue
+                var alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,it.getInt(2), it.getInt(3),0)
+                val alarmTimeEnd = LocalDateTime.of(today.year, today.month, today.dayOfMonth,it.getInt(4), it.getInt(5),0)
                 if(alarmTime.isAfter(alarmTimeEnd) && today.isAfter(alarmTimeEnd)) // 알람시작시가 종료시보다 후인경우, 종료시는 다음날 그 시각으로 설정 && 현시각이 알람종료시 이후인 경우에만(ex. 현시 새벽1시, 알람새벽2시종료)
                     alarmTimeEnd.plusDays(1)
                 if(alarmTimeEnd.isBefore(today)) //알람종료시가 현시각보다 전이면, 알람시각은 알람시작시+1일
@@ -141,30 +130,24 @@ class MainActivity : AppCompatActivity() {
                 else //알람종료시가 현시각보다 뒤면, 1. 현시각은 알람시작시 이전이거나 2. 알람기간 내에 위치
                     if(alarmTime.isAfter(alarmTimeEnd)) // 알람종료시가 현시각 이후지만, 알람시작시가 어제인 경우 (ex. 현시 새벽1시, 알람종료시 새벽2시)
                         alarmTime = LocalDateTime.of(today.year, today.month, today.dayOfMonth,0, 0,0)
-                    while(alarmTime.isBefore(today)) // 알람시작시가 현시각보다 이전이면 (알람기간 내 위치)
-                        alarmTime = alarmTime.plusMinutes(interval)
+                while(alarmTime.isBefore(today)) // 알람시작시가 현시각보다 이전이면 (알람기간 내 위치)
+                    alarmTime = alarmTime.plusMinutes(interval)
 
-                if (alarmTime.isBefore(closestTime)) { //가장 가까운 알람시간 갱신
-                    closestTime = alarmTime
-                    closestAlarmTitle = alarms.getString(1)
+                if (alarmTime.isBefore(closestTime.time)) { //가장 가까운 알람시간 갱신
+                    closestTime = Time(alarmTime, DTO(it), Time.ALARM_EXISTS)
                 }
+
+                val alarmIntent = Intent(this, AlarmReceiver::class.java)
+                    .putExtra("num",it.getInt(0))
+                    .putExtra("title",getString(R.string.noti_title))
+                    .putExtra("content",getString(R.string.noti_content))
+                //if (closestAlarmTitle.isNotEmpty()) alarmIntent.putExtra("title",closestAlarmTitle)
+                val pended = PendingIntent.getBroadcast(this, it.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+                am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime.time),pended),pended)
+                Log.v("###############################","알람 셋팅 closestTime: "+ closestTime+ " , 차이1 : "+ChronoUnit.MILLIS.between(today, closestTime.time))
             }
-            val alarmIntent = Intent(this, AlarmReceiver::class.java)
-                .putExtra("num",alarms.getInt(0))
-                .putExtra("title",getString(R.string.noti_title))
-                .putExtra("content",getString(R.string.noti_content))
-            if (closestAlarmTitle.isNotEmpty()) alarmIntent.putExtra("title",closestAlarmTitle)
-            val pender = PendingIntent.getBroadcast(this, alarms.getInt(0), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-            am.setAlarmClock(
-                AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(today, closestTime),pender),
-                pender)
-            Log.v("###############################","알람 셋팅 closestTime: "+ closestTime+ " , 차이1 : "+ChronoUnit.MILLIS.between(today, closestTime))
-            alarms.close()
-            return Time(closestTime, Time.ALARM_EXISTS)
-        }else{ //3. 알람이 아예 없는경우
-            alarms.close()
-            return Time(today, Time.NO_ALARMS)
         }
+        return closestTime
     }
     fun makeSwitch(data : DTO) : Switch {
         val params = LinearLayout.LayoutParams(
@@ -180,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             id = data.num
         }
         switch.setOnCheckedChangeListener { _, isNotChecked ->
-            val pended = PendingIntent.getBroadcast(applicationContext, data.num, Intent(this, AlarmReceiver::class.java).setAction("STRETCHING_TIME"), PendingIntent.FLAG_UPDATE_CURRENT)
+            val pended = PendingIntent.getBroadcast(applicationContext, data.num, Intent(this, AlarmReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
             am.cancel(pended)
             pended.cancel()
             data.settings = if (isNotChecked) data.settings or (1 shl 9) //off -> on

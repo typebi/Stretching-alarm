@@ -28,7 +28,7 @@ class ProgressPage : AppCompatActivity() {
             time_remaining.text = time.toString()
             Thread(Runnable {
                 while (progressBar.progress<600){
-                    progressBar.setProgress(progressBar.progress + 1, true)
+                    progressBar.setProgress(progressBar.progress + 1, false)
                     Thread.sleep(tick)
                 }
                 if(vibeFlag) vibe.vibrate(vibeEffect)

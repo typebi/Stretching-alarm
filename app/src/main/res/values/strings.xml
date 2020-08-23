@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Stretching Alarm</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings_1">White (Default)</string>
+    <string name="action_settings_2">Blue</string>
+    <string name="action_settings_3">Pink</string>
+    <string name="action_settings_4">Black</string>
 
     <string name="createTable">CREATE TABLE IF NOT EXISTS STRALARM (
         NUM INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -17,9 +20,10 @@
 
     <string name="alarm_display">다음 스트레칭\n</string>
     <string name="alarm_display_no_alarm">알람이 없어요</string>
+    <string name="setting_image_description">설정 이미지입니다</string>
 
     <string name="noti_title">스트레칭 할 시간이에요</string>
-    <string name="noti_content">지금 하면 15초, 안 하면 디스크 개작살</string>
+    <string name="noti_content">지금 하면 15초, 안 하면 디스크 박살</string>
 
     <string name="time_start">부터</string>
     <string name="time_end">까지</string>

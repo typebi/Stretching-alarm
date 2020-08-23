@@ -12,7 +12,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.content_main.*
-import java.time.DayOfWeek
+import kotlinx.android.synthetic.main.content_main.view.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -36,6 +36,11 @@ class MainActivity : AppCompatActivity() {
         testBtn.setOnClickListener{
             startActivity(Intent(this, ProgressPage::class.java))
         }
+        setting_menu.setOnClickListener {
+            registerForContextMenu(setting_menu)
+            openContextMenu(setting_menu)
+            unregisterForContextMenu(setting_menu)
+        }
         timeChecker = TimeCounter(this, checkClosest())
         timeChecker.start()
         if (intent.getBooleanExtra("isDoze",false)) {
@@ -48,17 +53,17 @@ class MainActivity : AppCompatActivity() {
         timeChecker = TimeCounter(this, checkClosest())
         timeChecker.start()
     }
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
-        return true
     }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onContextItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings_1 -> true
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -96,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         alarm_list.addView(ViewDrawer().addNewBtn(this))
     }
     private fun checkClosest() : Time {
-        var closest = ClosestChecker(this).check(DB.selectAlarms())
+        val closest = ClosestChecker(this).check(DB.selectAlarms())
         val now = LocalDateTime.now().plusSeconds(1)
         val alarmIntent = Intent(this, AlarmReceiver::class.java)
             .putExtra("num",closest.data.num)

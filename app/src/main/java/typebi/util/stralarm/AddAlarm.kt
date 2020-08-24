@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.add_alarm.*
 
 class AddAlarm : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
+        //setTheme(R.style.AppTheme_Blue)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_alarm)
         time_interval.minValue = 1

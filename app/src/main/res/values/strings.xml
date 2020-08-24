@@ -18,9 +18,12 @@
     <string name="insertAlarm">insert into STRALARM(NAME , START_H , START_M , END_H , END_M , INTERVAL, SETTINGS)  values($name, $sh, $sm, $eh, $em, $intvl, $settings)</string>
     <string name="selectLatest">select * from STRALARM order by NUM desc limit 1</string>
 
+    <string name="createThemeTable">CREATE TABLE IF NOT EXISTS ThemeSetting (SETTINGS INTEGER)</string>
+
     <string name="alarm_display">다음 스트레칭\n</string>
     <string name="alarm_display_no_alarm">알람이 없어요</string>
     <string name="setting_image_description">설정 이미지입니다</string>
+    <string name="anim_image_description">스타트 버튼 애니메이션 이미지입니다</string>
 
     <string name="noti_title">스트레칭 할 시간이에요</string>
     <string name="noti_content">지금 하면 15초, 안 하면 디스크 박살</string>

@@ -1,12 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#396FB4</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#396FB4</color>
     <color name="mainBackground_1">#F0F0F0</color>
     <color name="alarmBackground">#FFFFFF</color>
     <color name="textColor_1">#000000</color>
-    <color name="textColor_2">#396FB4</color>
-    <color name="textColor_3">#8AA8E6</color>
-    <color name="textColor_4">#969696</color>
+    <color name="subtextColor_1">#969696</color>
+
+    <color name="colorPrimary_2">#396FB4</color>
+    <color name="colorPrimaryDark_2">#000000</color>
+    <color name="colorAccent_2">#FFFFFF</color>
+    <color name="colorControlNormal_2">#E6E6E6</color>
+    <color name="mainBackground_2">#000000</color>
+    <color name="alarmBackground_2">#323232</color>
+    <color name="textColor_2">#FFFFFF</color>
+
+    <color name="colorPrimary_3">#396FB4</color>
+    <color name="colorPrimaryDark_3">#000000</color>
+    <color name="colorAccent_3">#FFFFFF</color>
+    <color name="colorControlNormal_3">#FFFFFF</color>
+    <color name="mainBackground_3">#396FB4</color>
+    <color name="alarmBackground_3">#8AA8E6</color>
+    <color name="textColor_3">#FFFFFF</color>
+
+    <color name="colorPrimary_4">#396FB4</color>
+    <color name="colorPrimaryDark_4">#000000</color>
+    <color name="colorAccent_4">#000000</color>
+    <color name="mainBackground_4">#396FB4</color>
+    <color name="alarmBackground_4">#8AA8E6</color>
+    <color name="textColor_4">#FFFFFF</color>
+
+    <color name="textColor_5">#396FB4</color>
+    <color name="textColor_6">#8AA8E6</color>
+    <color name="textColor_7">#969696</color>
 </resources>

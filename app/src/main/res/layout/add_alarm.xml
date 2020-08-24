@@ -135,7 +135,6 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_gravity="bottom"
-        android:background="#FFFFFF"
         ads:adSize="LARGE_BANNER"
         ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
     </com.google.android.gms.ads.AdView>

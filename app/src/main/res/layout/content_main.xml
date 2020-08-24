@@ -13,14 +13,13 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="100dp"
         android:layout_gravity="bottom"
-        android:background="@color/mainBackground_1"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_marginTop="15dp"
             android:orientation="horizontal"
-            android:gravity="right">
+            android:gravity="end">
             <Button android:id="@+id/testBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -42,7 +41,6 @@
             android:layout_height="230dp"
             android:layout_marginBottom="10dp"
             android:gravity="center"
-            android:textColor="@color/textColor_1"
             android:textSize="50sp"
             android:text="@string/alarm_display">
         </TextView>
@@ -65,7 +63,6 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_gravity="bottom"
-            android:background="#FFFFFF"
             ads:adSize="LARGE_BANNER"
             ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
         </com.google.android.gms.ads.AdView>

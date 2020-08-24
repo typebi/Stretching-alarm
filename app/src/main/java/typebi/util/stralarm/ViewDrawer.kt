@@ -28,6 +28,11 @@ class ViewDrawer {
             setBackgroundResource(R.drawable.border_layout)
             setImageResource(R.drawable.pointer_cell_large)
         }
+
+        //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_2)
+        //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_3)
+        //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_4)
+
         val intentFromNewbtn = Intent(main, AddAlarm::class.java).putExtra("isNew",true)
         plusAlarmBtn.setOnClickListener {
             main.startActivityForResult(intentFromNewbtn,1001)
@@ -43,6 +48,11 @@ class ViewDrawer {
         if (data.name.isNotEmpty()) mainActivity.alarm_list.children.last().innerLayout.alarm_name.text = data.name
         mainActivity.alarm_list.children.last().innerLayout.content.text = setStringStyle(mainActivity, content, data.settings)
         mainActivity.alarm_list.children.last().outerLayout.addView(mainActivity.makeSwitch(data))
+
+        //mainActivity.alarm_list.children.last().outerLayout.setBackgroundResource(R.drawable.border_layout_2)
+        //mainActivity.alarm_list.children.last().outerLayout.setBackgroundResource(R.drawable.border_layout_3)
+        //mainActivity.alarm_list.children.last().outerLayout.setBackgroundResource(R.drawable.border_layout_4)
+
         val intent = Intent(mainActivity, AddAlarm::class.java).apply {
             putExtra("num", data.num)
             putExtra("name", data.name)
@@ -57,7 +67,7 @@ class ViewDrawer {
             mainActivity.startActivityForResult(intent, 1002)
         }
     }
-    private fun setStringStyle(mainActivity : MainActivity, text : String, settings: Int) : SpannableString {
+    private fun setStringStyle(main : MainActivity, text : String, settings: Int) : SpannableString {
         val spannableString = SpannableString(text)
         if (text.contains("AM")) {
             spannableString.setSpan(RelativeSizeSpan(0.5f), text.indexOf("AM"), text.indexOf("AM") + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -70,16 +80,14 @@ class ViewDrawer {
                 spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("PM"), text.lastIndexOf("PM") + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         spannableString.setSpan(RelativeSizeSpan(0.5f), text.indexOf("월화수목금토일"), text.indexOf("월화수목금토일") + 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(ForegroundColorSpan(main.getColor(R.color.subtextColor_1)), text.indexOf("월화수목금토일"), text.indexOf("월화수목금토일") + 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("간격"), text.lastIndexOf("간격") + 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("분"), text.lastIndexOf("분") + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(ForegroundColorSpan(mainActivity.getColor(R.color.textColor_4)), text.indexOf("월화수목금토일"), text.indexOf("월화수목금토일") + 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         for (i in 0 .. 6) {
             if (settings == settings or (1 shl i)) {
-                spannableString.setSpan(
-                    StyleSpan(Typeface.BOLD),text.length - (7-i), text.length - (7-i)+1,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableString.setSpan(StyleSpan(Typeface.BOLD),text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableString.setSpan(ForegroundColorSpan(main.getColor(R.color.textColor_1)),text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 spannableString.setSpan(RelativeSizeSpan(1.2f), text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                spannableString.setSpan(ForegroundColorSpan(mainActivity.getColor(R.color.textColor_1)), text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
         return spannableString

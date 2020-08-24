@@ -7,6 +7,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.progress_page.*
 
@@ -21,6 +22,7 @@ class ProgressPage : AppCompatActivity() {
         val noti = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         noti.cancel(intent.getIntExtra("notiId",1))
         setContentView(R.layout.progress_page)
+        start_anim.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_bar_circle_anim))
         startBtn.setOnClickListener{
             startBtn.visibility = View.INVISIBLE
             val time : Int = intent.getIntExtra("time",15)

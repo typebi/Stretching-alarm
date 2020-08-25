@@ -136,6 +136,6 @@
         android:layout_height="100dp"
         android:layout_gravity="bottom"
         ads:adSize="LARGE_BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+        ads:adUnitId="@string/admob_test">
     </com.google.android.gms.ads.AdView>
 </FrameLayout>

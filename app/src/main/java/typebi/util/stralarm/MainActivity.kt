@@ -14,7 +14,6 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.content_main.view.*
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -25,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private val DB : DBAccesser by lazy { DBAccesser(this) }
     private val am : AlarmManager by lazy { getSystemService(ALARM_SERVICE) as AlarmManager }
     private lateinit var timeChecker:TimeCounter
-    private val snackbar by lazy {
+    private val snackBar by lazy {
         Snackbar.make(main_layout, "", Snackbar.LENGTH_LONG)
             .setActionTextColor(Color.WHITE)
             .setAction("EXIT"){
@@ -110,13 +109,14 @@ class MainActivity : AppCompatActivity() {
         }
         alarm_list.addView(ViewDrawer().addNewBtn(this))
     }
-    private fun checkClosest() : Time {
+    fun checkClosest() : Time {
         val closest = ClosestChecker(this).check(DB.selectAlarms())
         val now = LocalDateTime.now().plusSeconds(1)
         val alarmIntent = Intent(this, AlarmReceiver::class.java)
             .putExtra("num",closest.data.num)
             .putExtra("title",getString(R.string.noti_title))
             .putExtra("content",getString(R.string.noti_content))
+            .setAction(getString(R.string.noti_action_name))
         val pended = PendingIntent.getBroadcast(applicationContext, closest.data.num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
         am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ChronoUnit.MILLIS.between(now, closest.time),pended),pended)
         Log.v("###############################","알람 셋팅")
@@ -148,8 +148,8 @@ class MainActivity : AppCompatActivity() {
         return switch
     }
     override fun onBackPressed() {
-        if (snackbar.isShown) snackbar.dismiss()
-        else snackbar.show()
+        if (snackBar.isShown) snackBar.dismiss()
+        else snackBar.show()
     }
     override fun onDestroy() {
         super.onDestroy()

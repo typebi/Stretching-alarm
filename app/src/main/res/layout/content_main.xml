@@ -23,7 +23,7 @@
             <Button android:id="@+id/testBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ProgressBar Test"
+                android:text="@string/test_button_progressbar"
                 android:visibility="invisible">
             </Button>
             <ImageView android:id="@+id/setting_menu"
@@ -64,7 +64,7 @@
             android:layout_height="100dp"
             android:layout_gravity="bottom"
             ads:adSize="LARGE_BANNER"
-            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+            ads:adUnitId="@string/admob_test">
         </com.google.android.gms.ads.AdView>
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

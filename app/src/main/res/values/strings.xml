@@ -4,6 +4,16 @@
     <string name="action_settings_2">Blue</string>
     <string name="action_settings_3">Pink</string>
     <string name="action_settings_4">Black</string>
+    <string name="test_button_progressbar">ProgressBar Test</string>
+
+    <string name="admob_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_service">ca-app-pub-8511833551429584/2929659980</string>
+
+    <!-- Labels -->
+    <string name="setting_image_description">설정 이미지입니다</string>
+    <string name="anim_image_description">스타트 버튼 애니메이션 이미지입니다</string>
+    <string name="alarm_layout_description">알람 레이아웃입니다</string>
+    <string name="alarm_add_button_description">알람 추가 버튼입니다</string>
 
     <string name="createTable">CREATE TABLE IF NOT EXISTS STRALARM (
         NUM INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -22,9 +32,8 @@
 
     <string name="alarm_display">다음 스트레칭\n</string>
     <string name="alarm_display_no_alarm">알람이 없어요</string>
-    <string name="setting_image_description">설정 이미지입니다</string>
-    <string name="anim_image_description">스타트 버튼 애니메이션 이미지입니다</string>
 
+    <string name="noti_action_name">typebi.util.stralarm.alarmNotification</string>
     <string name="noti_title">스트레칭 할 시간이에요</string>
     <string name="noti_content">지금 하면 15초, 안 하면 디스크 박살</string>
 

@@ -8,6 +8,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlHighlight">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:windowBackground">@color/mainBackground_1</item>
         <item name="android:textColor">@color/textColor_1</item>
@@ -19,6 +21,8 @@
         <item name="colorPrimary">@color/colorPrimary_2</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark_2</item>
         <item name="colorAccent">@color/colorAccent_2</item>
+        <item name="colorControlHighlight">#FFFFFF</item>
+        <item name="colorControlNormal">#FFFFFF</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark_2</item>
         <item name="android:windowBackground">@color/mainBackground_2</item>
         <item name="android:textColor">@color/textColor_2</item>
@@ -78,7 +82,7 @@
         <item name="android:layout_marginLeft">-10dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:textSize">40dp</item>
+        <item name="android:textSize">40sp</item>
     </style>
     <style name="addAlarmPicker">
         <item name="android:layout_width">0dp</item>
@@ -92,7 +96,7 @@
         <item name="android:layout_marginLeft">0dp</item>
         <item name="android:layout_marginRight">0dp</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">25dp</item>
+        <item name="android:textSize">25sp</item>
     </style>
     <style name="addAlarmSettings">
         <item name="android:layout_width">wrap_content</item>
@@ -100,7 +104,7 @@
         <item name="android:layout_weight">5</item>
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
-        <item name="android:textSize">20dp</item>
+        <item name="android:textSize">20sp</item>
     </style>
     <style name="timePickerBlack" parent="@android:style/Widget.Material.Light.TimePicker">
         <item name="colorAccent">#ffffff</item>

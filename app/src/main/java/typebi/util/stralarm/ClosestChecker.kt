@@ -1,11 +1,37 @@
 package typebi.util.stralarm
 
+import android.app.AlarmManager
+import android.app.Application
+import android.app.PendingIntent
+import android.content.Intent
 import android.database.Cursor
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import java.time.DayOfWeek
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
-class ClosestChecker(private val main : MainActivity) {
+class ClosestChecker(private val application: Application) {
+    private val am : AlarmManager by lazy { application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager }
+    private val DB : DBAccesser by lazy { DBAccesser(application) }
+    fun setAlarm() : Time {
+        val closest = check(DB.selectAlarms())
+        val now = LocalDateTime.now().plusSeconds(1)
+        val notiTime = closest.time.hour.toString()+":"+reviseMin(closest.time.minute)+" "
+        val alarmIntent = Intent(application, AlarmReceiver::class.java)
+            .putExtra("num",closest.data.num)
+            .putExtra("title",notiTime+application.getString(R.string.noti_title))
+            .putExtra("content",application.getString(R.string.noti_content))
+            .setAction(application.getString(R.string.noti_action_name))
+        if (closest.data.name.isNotEmpty()) alarmIntent.putExtra("title",notiTime+closest.data.name)
+        val pended = PendingIntent.getBroadcast(application, closest.data.num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ ChronoUnit.MILLIS.between(now, closest.time),pended),pended)
+        Log.v("###############################","알람 셋팅")
+        return closest
+    }
+    fun cancel(pendingIntent: PendingIntent){
+        am.cancel(pendingIntent)
+    }
     fun check(data : Cursor) : Time {
         var closestTime = Time(LocalDateTime.now().plusYears(5),DTO(-1,"",-1,-1,-1,-1,-1,-1),Time.NO_ALARMS)
         val now = LocalDateTime.now().plusSeconds(1)
@@ -19,8 +45,6 @@ class ClosestChecker(private val main : MainActivity) {
                 var endTime = moveNextDay(LocalDateTime.of(now.year,now.month,now.dayOfMonth,it.getInt(4),it.getInt(5),0), setting)
                 if (startTime.isEqual(endTime)) endTime = endTime.plusDays(1)
                 if (startTime.isAfter(endTime)) endTime = endTime.plusDays(1)
-                Log.v("@@@ startTime @@@",startTime.toString())
-                Log.v("@@@ endTime @@@",endTime.toString())
                 if (now.isAfter(startTime) && now.isBefore(endTime)) {
                     while (startTime.isBefore(now))
                         startTime = startTime.plusMinutes(interval)
@@ -28,12 +52,11 @@ class ClosestChecker(private val main : MainActivity) {
                         startTime = moveNextDay(LocalDateTime.of(now.year,now.month,now.dayOfMonth,it.getInt(2),it.getInt(3),0).plusDays(1),setting)
                 }else if (now.isAfter(endTime))
                     startTime = moveNextDay(startTime.plusDays(1), setting)
-                Log.v("@@@ startTime2 @@@",startTime.toString())
                 if (startTime.isBefore(closestTime.time))
                     closestTime = Time(startTime, DTO(it), Time.ALARM_EXISTS)
             }
         }
-        Log.v("@@@ closestTime @@@",closestTime.time.toString())
+        Log.v("@@@ closestTime @@@",closestTime.time.toString()+" 알람상태 : "+closestTime.state)
         return closestTime
     }
     private fun moveNextDay(day : LocalDateTime, settings: Int):LocalDateTime{
@@ -48,5 +71,9 @@ class ClosestChecker(private val main : MainActivity) {
             else -> return day
         }
         return day
+    }
+    private fun reviseMin(time:Int) : String{
+        return if(time<10)  "0$time"
+        else  time.toString()
     }
 }

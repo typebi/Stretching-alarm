@@ -59,7 +59,7 @@
         android:layout_height="match_parent">
         <com.google.android.gms.ads.AdView
             xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/admob"
+            android:id="@+id/admob_1"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_gravity="bottom"

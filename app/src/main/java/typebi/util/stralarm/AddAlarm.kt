@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.add_alarm.*
 
 class AddAlarm : AppCompatActivity(){
@@ -12,6 +14,8 @@ class AddAlarm : AppCompatActivity(){
         //setTheme(R.style.AppTheme_Blue)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_alarm)
+        val adRequest = AdRequest.Builder().build()
+        admob_2.loadAd(adRequest)
         time_interval.minValue = 1
         time_interval.maxValue = 1440
         time_interval.value = intent.getIntExtra("intvl",15)

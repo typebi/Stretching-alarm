@@ -39,7 +39,7 @@
             <LinearLayout
                 style="@style/addAlarmContainer"
                 android:layout_width="0dp"
-                android:layout_weight="6">
+                android:layout_weight="7">
                 <NumberPicker android:id="@+id/time_interval"
                     android:layout_width="50dp"
                     android:layout_height="150dp"/>
@@ -47,6 +47,7 @@
             <TextView
                 style="@style/addAlarmText"
                 android:layout_weight="3"
+                android:textAlignment="center"
                 android:text="@string/time_interval_unit">
             </TextView>
         </LinearLayout>

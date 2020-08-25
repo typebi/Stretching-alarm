@@ -29,26 +29,6 @@
         <item name="android:textColorPrimary">#ffffff</item>
         <item name="android:timePickerStyle">@style/timePickerBlack</item>
     </style>
-    <style name="AppTheme.Pink" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="colorPrimary">@color/colorPrimary_3</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark_3</item>
-        <item name="colorAccent">@color/colorAccent_3</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark_3</item>
-    </style>
-    <style name="AppTheme.Blue" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="colorPrimary">@color/colorPrimary_4</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark_4</item>
-        <item name="colorAccent">@color/colorAccent_4</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark_4</item>
-        <item name="android:windowBackground">@color/mainBackground_4</item>
-        <item name="android:textColor">@color/textColor_4</item>
-        <item name="android:textColorPrimary">#ffffff</item>
-        <item name="android:timePickerStyle">@style/timePickerBlack</item>
-    </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -82,7 +62,7 @@
         <item name="android:layout_marginLeft">-10dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:textSize">40sp</item>
+        <item name="android:textSize">35sp</item>
     </style>
     <style name="addAlarmPicker">
         <item name="android:layout_width">0dp</item>

@@ -28,7 +28,7 @@ class ViewDrawer {
             setBackgroundResource(R.drawable.border_layout)
             setImageResource(R.drawable.pointer_cell_large)
         }
-        plusAlarmBtn.labelFor = R.string.alarm_add_button_description
+        //plusAlarmBtn.labelFor = main.getString(R.string.alarm_add_button_description)
         //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_2)
         //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_3)
         //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_4)

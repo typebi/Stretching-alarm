@@ -15,6 +15,7 @@ import androidx.core.view.children
 import kotlinx.android.synthetic.main.alarm.view.*
 import kotlinx.android.synthetic.main.content_main.*
 
+<<<<<<< HEAD
 class ViewDrawer(private val mainActivity : MainActivity) {
     fun addNewBtn() : ImageButton {
         val params = LinearLayout.LayoutParams(
@@ -42,6 +43,46 @@ class ViewDrawer(private val mainActivity : MainActivity) {
         if (data.name.isNotEmpty()) mainActivity.alarm_list.children.last().innerLayout.alarm_name.text = data.name
         mainActivity.alarm_list.children.last().innerLayout.content.text = setStringStyle(content, data.settings)
         mainActivity.alarm_list.children.last().outerLayout.addView(mainActivity.makeSwitch(data))
+=======
+class ViewDrawer {
+    fun addNewBtn(main : MainActivity) : ImageButton {
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            (110*main.resources.displayMetrics.density+0.5f).toInt()
+        )
+        val dp = (10*main.resources.displayMetrics.density+0.5f).toInt()
+        params.setMargins(0,dp,0,dp)
+        val plusAlarmBtn = ImageButton(main).apply {
+            layoutParams = params
+            setBackgroundResource(R.drawable.border_layout)
+            setImageResource(R.drawable.pointer_cell_large)
+        }
+        //plusAlarmBtn.labelFor = main.getString(R.string.alarm_add_button_description)
+        //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_2)
+        //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_3)
+        //plusAlarmBtn.setBackgroundResource(R.drawable.border_layout_4)
+
+        val intentFromNewbtn = Intent(main, AddAlarm::class.java).putExtra("isNew",true)
+        plusAlarmBtn.setOnClickListener {
+            main.startActivityForResult(intentFromNewbtn,1001)
+        }
+        return plusAlarmBtn
+    }
+    fun addNewAlarmToLayout(mainActivity : MainActivity, data : DTO){
+        val fixedSh = reviseHour(data.startHour)
+        val fixedEh = reviseHour(data.endHour)
+        val content = "$fixedSh:"+addZero(data.startMin)+" ~ $fixedEh:"+addZero(data.endMin)+"  간격:"+data.interval+"분\n월화수목금토일"
+        val layoutInflater = mainActivity.getSystemService(AppCompatActivity.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        layoutInflater.inflate(R.layout.alarm,mainActivity.alarm_list,true)
+        if (data.name.isNotEmpty()) mainActivity.alarm_list.children.last().innerLayout.alarm_name.text = data.name
+        mainActivity.alarm_list.children.last().innerLayout.content.text = setStringStyle(mainActivity, content, data.settings)
+        mainActivity.alarm_list.children.last().outerLayout.addView(mainActivity.makeSwitch(data))
+
+        //mainActivity.alarm_list.children.last().outerLayout.setBackgroundResource(R.drawable.border_layout_2)
+        //mainActivity.alarm_list.children.last().outerLayout.setBackgroundResource(R.drawable.border_layout_3)
+        //mainActivity.alarm_list.children.last().outerLayout.setBackgroundResource(R.drawable.border_layout_4)
+
+>>>>>>> develop
         val intent = Intent(mainActivity, AddAlarm::class.java).apply {
             putExtra("num", data.num)
             putExtra("name", data.name)
@@ -56,7 +97,11 @@ class ViewDrawer(private val mainActivity : MainActivity) {
             mainActivity.startActivityForResult(intent, 1002)
         }
     }
+<<<<<<< HEAD
     private fun setStringStyle(text : String, settings: Int) : SpannableString {
+=======
+    private fun setStringStyle(main : MainActivity, text : String, settings: Int) : SpannableString {
+>>>>>>> develop
         val spannableString = SpannableString(text)
         if (text.contains("AM")) {
             spannableString.setSpan(RelativeSizeSpan(0.5f), text.indexOf("AM"), text.indexOf("AM") + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -69,6 +114,7 @@ class ViewDrawer(private val mainActivity : MainActivity) {
                 spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("PM"), text.lastIndexOf("PM") + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         spannableString.setSpan(RelativeSizeSpan(0.5f), text.indexOf("월화수목금토일"), text.indexOf("월화수목금토일") + 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+<<<<<<< HEAD
         spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("간격"), text.lastIndexOf("간격") + 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("분"), text.lastIndexOf("분") + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannableString.setSpan(ForegroundColorSpan(mainActivity.getColor(R.color.textColor_4)), text.indexOf("월화수목금토일"), text.indexOf("월화수목금토일") + 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -79,12 +125,36 @@ class ViewDrawer(private val mainActivity : MainActivity) {
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 spannableString.setSpan(RelativeSizeSpan(1.2f), text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 spannableString.setSpan(ForegroundColorSpan(mainActivity.getColor(R.color.textColor_1)), text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+=======
+        spannableString.setSpan(ForegroundColorSpan(main.getColor(R.color.subtextColor_1)), text.indexOf("월화수목금토일"), text.indexOf("월화수목금토일") + 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("간격"), text.lastIndexOf("간격") + 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(RelativeSizeSpan(0.5f), text.lastIndexOf("분"), text.lastIndexOf("분") + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        for (i in 0 .. 6) {
+            if (settings == settings or (1 shl i)) {
+                spannableString.setSpan(StyleSpan(Typeface.BOLD),text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableString.setSpan(ForegroundColorSpan(main.getColor(R.color.textColor_1)),text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableString.setSpan(RelativeSizeSpan(1.2f), text.length - (7-i), text.length - (7-i)+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+>>>>>>> develop
             }
         }
         return spannableString
     }
+<<<<<<< HEAD
     private fun reviseTime(time:Int) :String{
         return if(time<10) "0$time"
         else time.toString()
     }
+=======
+    private fun addZero(time:Int) : String{
+        return if(time<10) "0$time"
+        else time.toString()
+    }
+    private fun reviseHour(time:Int) : String{
+        return when (time-12){
+            in 1 .. Int.MAX_VALUE -> "PM"+(time-12)
+            0 -> "PM $time"
+            else -> "AM $time"
+        }
+    }
+>>>>>>> develop
 }

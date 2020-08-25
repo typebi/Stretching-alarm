@@ -2,18 +2,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-<<<<<<< HEAD
-            <stroke android:width="0dp"
-                android:color="@color/textColor_1"/>
-            <corners android:radius="20dp"/>
-=======
+            <stroke android:width="2dp"
+                android:color="#FFFFFF"/>
             <corners android:radius="15dp"/>
->>>>>>> develop
             <padding android:left="15dp"
                 android:right="15dp"
-                android:bottom="10dp"
-                android:top="10dp"/>
-            <solid android:color="@color/alarmBackground"/>
+                android:bottom="15dp"
+                android:top="15dp"/>
+            <solid android:color="@color/alarmBackground_4"/>
         </shape>
     </item>
 </selector>

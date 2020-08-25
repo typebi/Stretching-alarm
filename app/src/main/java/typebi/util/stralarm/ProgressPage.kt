@@ -24,7 +24,11 @@ class ProgressPage : AppCompatActivity() {
         val noti = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         noti.cancel(intent.getIntExtra("notiId",1))
         setContentView(R.layout.progress_page)
+<<<<<<< HEAD
         start_anim_imageview.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_bar_circle_anim))
+=======
+        start_anim.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_bar_circle_anim))
+>>>>>>> develop
         startBtn.setOnClickListener{
             startBtn.visibility = View.INVISIBLE
             start_anim_imageview.clearAnimation()
@@ -32,8 +36,13 @@ class ProgressPage : AppCompatActivity() {
             val time : Int = intent.getIntExtra("time",15)
             val tick : Long = 1000 / (600 / time.toLong())
             time_remaining.text = time.toString()
+<<<<<<< HEAD
             Thread {
                 while (progressBar.progress < 600) {
+=======
+            Thread(Runnable {
+                while (progressBar.progress<600){
+>>>>>>> develop
                     progressBar.setProgress(progressBar.progress + 1, false)
                     Thread.sleep(tick)
                 }

@@ -11,6 +11,7 @@ import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
+@Suppress("PrivatePropertyName")
 class ClosestChecker(private val application: Application) {
     private val am : AlarmManager by lazy { application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager }
     private val DB : DBAccesser by lazy { DBAccesser(application) }
@@ -29,10 +30,18 @@ class ClosestChecker(private val application: Application) {
         Log.v("###############################","알람 셋팅")
         return closest
     }
-    fun cancel(pendingIntent: PendingIntent){
-        am.cancel(pendingIntent)
+    fun cancel(num :Int, name:String?){
+        val alarmIntent = Intent(application, AlarmReceiver::class.java)
+            .putExtra("num",num)
+            .putExtra("title",application.getString(R.string.noti_title))
+            .putExtra("content",application.getString(R.string.noti_content))
+            .setAction(application.getString(R.string.noti_action_name))
+        if (name!=null && name.isNotEmpty()) alarmIntent.putExtra("title",name)
+        val pended = PendingIntent.getBroadcast(application, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        (application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager).cancel(pended)
+        Log.v("###############################","알람 캔슬")
     }
-    fun check(data : Cursor) : Time {
+    private fun check(data : Cursor) : Time {
         var closestTime = Time(LocalDateTime.now().plusYears(5),DTO(-1,"",-1,-1,-1,-1,-1,-1),Time.NO_ALARMS)
         val now = LocalDateTime.now().plusSeconds(1)
         data.use {

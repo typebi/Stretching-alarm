@@ -54,6 +54,7 @@
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
+    <!--
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -64,7 +65,8 @@
             android:layout_height="100dp"
             android:layout_gravity="bottom"
             ads:adSize="LARGE_BANNER"
-            ads:adUnitId="@string/admob_test">
+            ads:adUnitId="@string/admob_service">
         </com.google.android.gms.ads.AdView>
     </FrameLayout>
+    -->
 </androidx.constraintlayout.widget.ConstraintLayout>

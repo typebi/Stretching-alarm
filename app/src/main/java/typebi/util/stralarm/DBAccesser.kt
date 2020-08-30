@@ -1,5 +1,3 @@
-@file:Suppress("SpellCheckingInspection")
-
 package typebi.util.stralarm
 
 import android.app.Application
@@ -8,7 +6,8 @@ import android.content.Intent
 import android.database.Cursor
 import androidx.appcompat.app.AppCompatActivity
 
-class DBAccesser(private val application: Application) {
+@Suppress("PrivatePropertyName", "SpellCheckingInspection")
+class DBAccesser(application: Application) {
     private val DB = application.openOrCreateDatabase("stretchingAlarm", AppCompatActivity.MODE_PRIVATE, null)
     private val tableName = "STRALARM"
     private val selectAllStatement = "select * from STRALARM"

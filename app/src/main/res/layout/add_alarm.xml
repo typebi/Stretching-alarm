@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:layout_marginBottom="100dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -113,10 +117,12 @@
             <Switch android:id="@+id/switch_ring"
                 style="@style/addAlarmSettings"
                 android:text="@string/bell_setting"
-                android:visibility="invisible"/>
+                android:visibility="invisible"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
             <Switch android:id="@+id/switch_vibe"
                 style="@style/addAlarmSettings"
-                android:text="@string/vibration_setting"/>
+                android:text="@string/vibration_setting"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
         </LinearLayout>
         <LinearLayout
             style="@style/addAlarmContainer"
@@ -131,12 +137,15 @@
                 android:text="@string/confirm_button"/>
         </LinearLayout>
     </LinearLayout>
+    </ScrollView>
+    <!--
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/admob_2"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_gravity="bottom"
         ads:adSize="LARGE_BANNER"
-        ads:adUnitId="@string/admob_test">
+        ads:adUnitId="@string/admob_service">
     </com.google.android.gms.ads.AdView>
+    -->
 </FrameLayout>

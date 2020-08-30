@@ -15,7 +15,7 @@ class AddAlarm : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_alarm)
         val adRequest = AdRequest.Builder().build()
-        admob_2.loadAd(adRequest)
+        //admob_2.loadAd(adRequest)
         time_interval.minValue = 1
         time_interval.maxValue = 1440
         time_interval.value = intent.getIntExtra("intvl",15)

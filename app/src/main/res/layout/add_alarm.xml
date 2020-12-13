@@ -138,6 +138,7 @@
         </LinearLayout>
     </LinearLayout>
     </ScrollView>
+    <!--
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/admob_2"
         android:layout_width="match_parent"
@@ -146,4 +147,5 @@
         ads:adSize="LARGE_BANNER"
         ads:adUnitId="@string/admob_test">
     </com.google.android.gms.ads.AdView>
+    -->
 </FrameLayout>

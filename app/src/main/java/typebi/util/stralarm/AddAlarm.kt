@@ -14,8 +14,8 @@ class AddAlarm : AppCompatActivity(){
         //setTheme(R.style.AppTheme_Blue)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_alarm)
-        MobileAds.initialize(this)
-        admob_2.loadAd(AdRequest.Builder().build())
+//        MobileAds.initialize(this)
+//        admob_2.loadAd(AdRequest.Builder().build())
         time_interval.minValue = 1
         time_interval.maxValue = 1440
         time_interval.value = intent.getIntExtra("intvl",15)

@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
@@ -20,16 +21,17 @@ class ProgressPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val noti = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         noti.cancel(intent.getIntExtra("notiId",1))
+        Log.v("%%%%%%%%%%%","noti ID : "+intent.getIntExtra("notiId",1)+" %% noti time : "+intent.getIntExtra("time",30))
         setContentView(R.layout.progress_page)
         start_anim.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_bar_circle_anim))
         startBtn.setOnClickListener{
             startBtn.visibility = View.INVISIBLE
-            val time : Int = intent.getIntExtra("time",15)
+            val time : Int = intent.getIntExtra("time",30)
             val tick : Long = 1000 / (600 / time.toLong())
             time_remaining.text = time.toString()
             Thread {
                 while (progressBar.progress < 600) {
-                    progressBar.setProgress(progressBar.progress + 1, false)
+                    progressBar.setProgress(progressBar.progress + 1, true)
                     Thread.sleep(tick)
                 }
                 if (vibeFlag) vibe.vibrate(vibeEffect)

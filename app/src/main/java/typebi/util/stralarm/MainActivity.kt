@@ -32,9 +32,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.v("@@@@@@@@@@@@@@@@@","onCreate() 실행")
         setContentView(R.layout.activity_main)
-        MobileAds.initialize(this) {}
-        val adRequest = AdRequest.Builder().build()
-        //admob_1.loadAd(adRequest)
+        MobileAds.initialize(this)
+        admob_1.loadAd(AdRequest.Builder().build())
         DB.createTable(getString(R.string.createTable))
         renewAlarms()
         testBtn.setOnClickListener{

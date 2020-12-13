@@ -36,18 +36,22 @@ class NotificationHandler(private val context: Context){
                             .setDefaults(Notification.DEFAULT_VIBRATE)
                             .setPriority(Notification.PRIORITY_HIGH)
                     }
-
-        val pender = PendingIntent.getActivity(context,1, Intent(context, ProgressPage::class.java).putExtra("time",15).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_CANCEL_CURRENT)
         val icon = android.R.drawable.ic_lock_idle_alarm
         myBuilder.setContentTitle(title)
             .setContentText(text)
-            .setAutoCancel(true)
-            .setContentIntent(pender)
+            //.setAutoCancel(true)
+            .setContentIntent(makePendingIntent(60, 1))
             .setSmallIcon(icon)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
-            .addAction(Builder(Icon.createWithResource(context, icon), "15sec", pender).build())
-            .addAction(Builder(Icon.createWithResource(context, icon), "30sec", PendingIntent.getActivity(context,0, Intent(context, ProgressPage::class.java).putExtra("time",30).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),0)).build())
-            .addAction(Builder(Icon.createWithResource(context, icon), "Pass", PendingIntent.getBroadcast(context,0, Intent(context, Dismisser::class.java).putExtra("notiId",1).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),0)).build())
+            .setActions(Builder(Icon.createWithResource(context, icon), "30sec", makePendingIntent(30, 30)).build(),
+                Builder(Icon.createWithResource(context, icon), "60sec", makePendingIntent(60, 60)).build())
+            .addAction(Builder(Icon.createWithResource(context, icon), "Pass", makePendingIntent(60, 0)).build())
         noti.notify(1, myBuilder.build())
+    }
+    private fun makePendingIntent(time : Int, passOrNot : Int) : PendingIntent{
+        return if(passOrNot==1)
+            PendingIntent.getActivity(context,passOrNot, Intent(context, ProgressPage::class.java).putExtra("time",time).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),PendingIntent.FLAG_CANCEL_CURRENT)
+        else
+            PendingIntent.getBroadcast(context,passOrNot, Intent(context, Dismisser::class.java).putExtra("notiId",1).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),0)
     }
 }

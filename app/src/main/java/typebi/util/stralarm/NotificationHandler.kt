@@ -42,8 +42,8 @@ class NotificationHandler(private val context: Context){
             .setContentIntent(makePendingIntent(60, 1))
             .setSmallIcon(icon)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
-            .setActions(Builder(Icon.createWithResource(context, icon), "30sec", makePendingIntent(30, 30)).build(),
-                Builder(Icon.createWithResource(context, icon), "60sec", makePendingIntent(60, 60)).build())
+            .setActions(Builder(Icon.createWithResource(context, icon), "30sec", makePendingIntent(30, 1)).build(),
+                Builder(Icon.createWithResource(context, icon), "60sec", makePendingIntent(60, 1)).build())
             .addAction(Builder(Icon.createWithResource(context, icon), "Pass", makePendingIntent(60, 0)).build())
         noti.notify(1, myBuilder.build())
     }

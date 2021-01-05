@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 
 @Suppress("SpellCheckingInspection")
 class Dismisser :BroadcastReceiver(){
@@ -11,6 +12,7 @@ class Dismisser :BroadcastReceiver(){
         if (context!=null && intent!=null) {
             val noti = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             noti.cancel(intent.getIntExtra("notiId",1))
+            Log.v("ddddddddddd","DISMISS SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
         }
     }
 

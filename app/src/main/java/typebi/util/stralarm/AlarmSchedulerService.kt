@@ -7,7 +7,7 @@ import android.util.Log
 class AlarmSchedulerService : JobService(){
     override fun onStartJob(p0: JobParameters?): Boolean {
         val noti = NotificationHandler(this)
-        noti.showNoti(getString(R.string.noti_title), getString(R.string.noti_content), true)
+        noti.showNoti(getString(R.string.noti_title), getString(R.string.noti_content))
         Log.v("##################", "알람스케쥴러서비스 노티 동작")
         return false
     }

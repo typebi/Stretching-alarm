@@ -6,11 +6,6 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimary">@color/colorPrimary</item>
-<<<<<<< HEAD
-        <item name="colorPrimaryDark">@color/textColor_1</item>
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="android:statusBarColor">@color/textColor_1</item>
-=======
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorControlHighlight">@color/colorAccent</item>
@@ -33,7 +28,6 @@
         <item name="android:textColor">@color/textColor_2</item>
         <item name="android:textColorPrimary">#ffffff</item>
         <item name="android:timePickerStyle">@style/timePickerBlack</item>
->>>>>>> develop
     </style>
 
     <style name="AppTheme.NoActionBar">

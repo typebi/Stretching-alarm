@@ -6,28 +6,10 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_main"
+    android:id="@+id/main_layout">
     <FrameLayout
         android:layout_width="match_parent"
-<<<<<<< HEAD
-        android:layout_height="match_parent">
-        <Button android:id="@+id/testBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ProgressBar Test"
-            android:visibility="invisible">
-        </Button>
-        <ImageView android:id="@+id/setting_menu"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="right"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/perm_group_system_tools"
-            android:translationZ="1dp"
-            android:visibility="invisible"/>
-        <LinearLayout android:id="@+id/main_layout"
-=======
         android:layout_height="match_parent"
         android:layout_marginBottom="100dp"
         android:layout_gravity="bottom"
@@ -63,47 +45,25 @@
             android:text="@string/alarm_display">
         </TextView>
         <ScrollView
->>>>>>> develop
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom"
             android:background="@color/mainBackground_1"
             android:orientation="vertical">
-
-            <TextView android:id="@+id/time_display"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:gravity="center"
-                android:textColor="@color/textColor_1"
-                android:textSize="50sp">
-            </TextView>
-            <com.google.android.gms.ads.AdView
-                xmlns:ads="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/admob"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-<<<<<<< HEAD
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"
-                android:background="#FFFFFF"
-                ads:adSize="LARGE_BANNER"
-                ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
-            </com.google.android.gms.ads.AdView>
-            <ScrollView
+            <LinearLayout android:id="@+id/alarm_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <LinearLayout android:id="@+id/alarm_list"
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                </LinearLayout>
-            </ScrollView>
-        </LinearLayout>
-=======
-                android:orientation="vertical">
+                    android:layout_height="250dp"
+                    android:gravity="center"
+                    android:textColor="@color/textColor_1"
+                    android:textSize="50sp">
+                </TextView>
             </LinearLayout>
         </ScrollView>
-    </LinearLayout>
+    </FrameLayout>
+    <!--
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -116,6 +76,6 @@
             ads:adSize="LARGE_BANNER"
             ads:adUnitId="@string/admob_test">
         </com.google.android.gms.ads.AdView>
->>>>>>> develop
     </FrameLayout>
+    -->
 </androidx.constraintlayout.widget.ConstraintLayout>

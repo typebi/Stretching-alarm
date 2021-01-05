@@ -20,36 +20,26 @@ class ProgressPage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vibeFlag = intent.getBooleanExtra("vibration",true)
-        Log.v("##################", "ProgressPage vibeFlag : "+vibeFlag)
+        Log.v("##################", "ProgressPage vibeFlag : $vibeFlag")
         val noti = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         noti.cancel(intent.getIntExtra("notiId",1))
+        Log.v("%%%%%%%%%%%","noti ID : "+intent.getIntExtra("notiId",1)+" %% noti time : "+intent.getIntExtra("time",30))
         setContentView(R.layout.progress_page)
-<<<<<<< HEAD
-        start_anim_imageview.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_bar_circle_anim))
-=======
         start_anim.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_bar_circle_anim))
->>>>>>> develop
         startBtn.setOnClickListener{
             startBtn.visibility = View.INVISIBLE
-            start_anim_imageview.clearAnimation()
-            start_anim_imageview.visibility = View.INVISIBLE
-            val time : Int = intent.getIntExtra("time",15)
+            val time : Int = intent.getIntExtra("time",30)
             val tick : Long = 1000 / (600 / time.toLong())
             time_remaining.text = time.toString()
-<<<<<<< HEAD
             Thread {
                 while (progressBar.progress < 600) {
-=======
-            Thread(Runnable {
-                while (progressBar.progress<600){
->>>>>>> develop
-                    progressBar.setProgress(progressBar.progress + 1, false)
+                    progressBar.setProgress(progressBar.progress + 1, true)
                     Thread.sleep(tick)
                 }
                 if (vibeFlag) vibe.vibrate(vibeEffect)
             }.start()
-            Thread{
-                for (i in 0 .. time) {
+            Thread {
+                for (i in 0..time) {
                     time_remaining.text = (time - i).toString()
                     Thread.sleep(1000)
                 }

@@ -1,7 +1,7 @@
 package typebi.util.stralarm
 
+import android.annotation.SuppressLint
 import android.app.*
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.*
@@ -14,9 +14,6 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_main.*
-import java.time.DayOfWeek
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,9 +32,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.v("@@@@@@@@@@@@@@@@@","onCreate() 실행")
         setContentView(R.layout.activity_main)
-        MobileAds.initialize(this) {}
-        val adRequest = AdRequest.Builder().build()
-        admob_1.loadAd(adRequest)
+        //MobileAds.initialize(this)
+        //admob_1.loadAd(AdRequest.Builder().build())
         DB.createTable(getString(R.string.createTable))
         renewAlarms()
         testBtn.setOnClickListener{
@@ -92,14 +88,7 @@ class MainActivity : AppCompatActivity() {
             }
         }else if (resultCode == Activity.RESULT_CANCELED && data!=null){
             DB.deleteAlarm(data)
-            val alarmIntent = Intent(application, AlarmReceiver::class.java)
-                .putExtra("num",data.getIntExtra("num",-1))
-                .putExtra("title",application.getString(R.string.noti_title))
-                .putExtra("content",application.getString(R.string.noti_content))
-                .setAction(application.getString(R.string.noti_action_name))
-            if (data.getStringExtra("name").isNotEmpty()) alarmIntent.putExtra("title",data.getStringExtra("name"))
-            val pended = PendingIntent.getBroadcast(application, data.getIntExtra("num",-1), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-            (application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager).cancel(pended)
+            ClosestChecker(application).cancel(data.getIntExtra("num",-1), data.getStringExtra("name"))
             makeDisplayThread()
             renewAlarms()
         }
@@ -112,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         }
         alarm_list.addView(ViewDrawer().addNewBtn(this))
     }
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
     fun makeSwitch(data : DTO) : Switch {
         val params = LinearLayout.LayoutParams(
             (10*resources.displayMetrics.density+0.5f).toInt(),
@@ -126,15 +116,7 @@ class MainActivity : AppCompatActivity() {
             id = data.num
         }
         switch.setOnCheckedChangeListener { _, isNotChecked ->
-            val alarmIntent = Intent(application, AlarmReceiver::class.java)
-                .putExtra("num",data.num)
-                .putExtra("title",application.getString(R.string.noti_title))
-                .putExtra("content",application.getString(R.string.noti_content))
-                .setAction(application.getString(R.string.noti_action_name))
-            if (data.name.isNotEmpty()) alarmIntent.putExtra("title",data.name)
-            val pended = PendingIntent.getBroadcast(application, data.num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-            (application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager).cancel(pended)
-            Log.v("###############################","알람 캔슬")
+            ClosestChecker(application).cancel(data.num, data.name)
             data.settings = if (isNotChecked) data.settings or (1 shl 9) //off -> on
             else data.settings xor (1 shl 9) //on -> off
             DB.updateAlarm(data)

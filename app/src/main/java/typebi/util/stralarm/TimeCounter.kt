@@ -13,14 +13,14 @@ class TimeCounter(private val main: MainActivity, private var closest: Time):Thr
                 main.time_display.text = main.getString(R.string.alarm_display_no_alarm)
                 break
             }
-            Log.v("#################","쓰레드 도는 중 "+closest.data.num+" "+closest.state)
+            //Log.v("#################","쓰레드 도는 중 "+closest.data.num+" "+closest.state)
             val hour = reviseTime(ChronoUnit.HOURS.between(LocalDateTime.now(), closest.time))
             val min = reviseTime(ChronoUnit.MINUTES.between(LocalDateTime.now(), closest.time) - hour.toInt()*60)
             val sec = reviseTime(ChronoUnit.SECONDS.between(LocalDateTime.now(), closest.time) - hour.toInt()*60*60 - min.toInt()*60)
             main.time_display.text = if (hour.toInt()>0) main.getString(R.string.alarm_display)+"$hour : $min : $sec"
             else main.getString(R.string.alarm_display)+"$min : $sec"
             if(ChronoUnit.SECONDS.between(LocalDateTime.now(), closest.time)<=0) {
-                Log.v("##################","새 쓰레드 호출")
+                //.v("##################","새 쓰레드 호출")
                 main.makeDisplayThread()
                 break
             }

@@ -42,13 +42,13 @@ class NotificationHandler(private val context: Context){
             .setContentIntent(makePendingIntent(60, 1))
             .setSmallIcon(icon)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
-            .setActions(Builder(Icon.createWithResource(context, icon), "30sec", makePendingIntent(30, 1)).build(),
-                Builder(Icon.createWithResource(context, icon), "60sec", makePendingIntent(60, 1)).build())
+            .setActions(Builder(Icon.createWithResource(context, icon), "30sec", makePendingIntent(30, 2)).build(),
+                Builder(Icon.createWithResource(context, icon), "60sec", makePendingIntent(60, 3)).build())
             .addAction(Builder(Icon.createWithResource(context, icon), "Pass", makePendingIntent(60, 0)).build())
         noti.notify(1, myBuilder.build())
     }
     private fun makePendingIntent(time : Int, passOrNot : Int) : PendingIntent{
-        return if(passOrNot==1)
+        return if(passOrNot!=0)
             PendingIntent.getActivity(context,passOrNot, Intent(context, ProgressPage::class.java).putExtra("time",time).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),PendingIntent.FLAG_CANCEL_CURRENT)
         else
             PendingIntent.getBroadcast(context,passOrNot, Intent(context, Dismisser::class.java).putExtra("notiId",1).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),0)

@@ -27,7 +27,7 @@ class ClosestChecker(private val application: Application) {
         if (closest.data.name.isNotEmpty()) alarmIntent.putExtra("title",notiTime+closest.data.name)
         val pended = PendingIntent.getBroadcast(application, closest.data.num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
         am.setAlarmClock(AlarmManager.AlarmClockInfo(System.currentTimeMillis()+ ChronoUnit.MILLIS.between(now, closest.time),pended),pended)
-        Log.v("###############################","알람 셋팅")
+        //Log.v("###############################","알람 셋팅")
         return closest
     }
     fun cancel(num :Int, name:String?){
@@ -39,7 +39,7 @@ class ClosestChecker(private val application: Application) {
         if (name!=null && name.isNotEmpty()) alarmIntent.putExtra("title",name)
         val pended = PendingIntent.getBroadcast(application, num, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT)
         (application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager).cancel(pended)
-        Log.v("###############################","알람 캔슬")
+        //Log.v("###############################","알람 캔슬")
     }
     private fun check(data : Cursor) : Time {
         var closestTime = Time(LocalDateTime.now().plusYears(5),DTO(-1,"",-1,-1,-1,-1,-1,-1),Time.NO_ALARMS)
@@ -65,7 +65,7 @@ class ClosestChecker(private val application: Application) {
                     closestTime = Time(startTime, DTO(it), Time.ALARM_EXISTS)
             }
         }
-        Log.v("@@@ closestTime @@@",closestTime.time.toString()+" 알람상태 : "+closestTime.state)
+        //Log.v("@@@ closestTime @@@",closestTime.time.toString()+" 알람상태 : "+closestTime.state)
         return closestTime
     }
     private fun moveNextDay(day : LocalDateTime, settings: Int):LocalDateTime{
